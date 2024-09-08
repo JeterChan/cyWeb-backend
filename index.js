@@ -3,6 +3,9 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require("cors");
 
+// router
+const productRouter = require('./routes/productRouter.js')
+
 dotenv.config();
 
 const app = express();
@@ -23,9 +26,9 @@ connection.once("open", () => {
     console.log("mongo connected");
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello, world!');
-});
+app.use('/api/product', productRouter);
+
+
 
 app.listen(8080, () => {
     console.log('Server listening on "http://localhost:8080"');
