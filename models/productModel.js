@@ -10,10 +10,10 @@ const productSchema = new Schema({
         type:String,
     },
     price:{
-        type:Number,
+        type:String,
         required:true
     },
-    Specification:{
+    specification:{
         type:String,
     },
     description:{
@@ -22,6 +22,10 @@ const productSchema = new Schema({
     category:{
         type:Schema.Types.ObjectId,
         ref:'Category'
+    },
+    image:{
+        type:String,
+        default:""
     }      
 })
 
