@@ -1,13 +1,12 @@
 const { ModifiedPathsSnapshot } = require('mongoose');
-const productModel = require('../models/productModel');
 const ProductModel = require('../models/productModel');
+const ImageModel = require('../models/imageModel');
 
 // CRUD api
-
 // get all product
 const getAllProducts = async (req, res) => {
     try {
-        const products = await ProductModel.find();
+        const products = await roductModel.find();
         res.status(200).json(products)
     } catch(error) {
         res.status(500).json({message:error.message})
@@ -71,8 +70,43 @@ const deleteProduct = async (req,res) => {
     }
 }
 
-module.exports.getAllProducts = getAllProducts;
-module.exports.getOneProduct = getOneProduct;
-module.exports.createProduct = createProduct;
-module.exports.updateProduct = updateProduct;
-module.exports.deleteProduct = deleteProduct;
+// upload image
+const uploadImage = async (req, res) => {
+    try {
+        const image = {
+            data: req.file.buffer,          // Image buffer
+            contentType: req.file.mimetype, // Image type (e.g., 'image/png')
+            filename: req.file.originalname // Original file name
+        }; 
+        await ImageModel.create(image);
+        res.status(200).json({message:'Upload success!'});
+    } catch (error) {
+        res.status(500).json({message:error.message});
+    }
+}
+
+// read image
+const readImage = async (req, res) => {
+    try {
+        const image = await ImageModel.findById(req.params._id);
+
+        if (!image) {
+            return res.status(404).json({ message: 'Image not found' });
+        }
+
+        res.set('Content-Type', 'image/jpg');
+        res.status(200).send(image.data);
+    } catch (error) {
+        res.status(404).json({message:error.message});
+    }
+}
+
+module.exports = { 
+    getAllProducts, 
+    getOneProduct, 
+    createProduct, 
+    updateProduct, 
+    deleteProduct,
+    uploadImage,
+    readImage
+};

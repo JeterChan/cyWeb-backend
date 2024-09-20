@@ -9,7 +9,11 @@ const productRouter = require('./routes/productRouter.js')
 dotenv.config();
 
 const app = express();
+
+// middleware
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+
 app.use(
     cors({
         origin:"*",
@@ -27,8 +31,6 @@ connection.once("open", () => {
 });
 
 app.use('/api/product', productRouter);
-
-
 
 app.listen(8080, () => {
     console.log('Server listening on "http://localhost:8080"');
