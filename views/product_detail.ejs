@@ -1,0 +1,61 @@
+<%- include('layouts/_header')  %>
+<body>
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" href="#!">駿英企業社</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!">關於駿英</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">商店</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/api/product">全部商品</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" href="#!">聖誕節商品</a></li>
+                            <li><a class="dropdown-item" href="#!">2024最新目錄</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <button class="btn btn-outline-dark" type="submit">
+                        <i class="bi-cart-fill me-1"></i>
+                        <!-- Cart -->
+                        <!-- 動態新增數量 -->
+                        <span class="badge bg-dark text-white ms-1 rounded-pill"><%= cartItemCount %></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <!-- Product section-->
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <div class="col-md-6">
+                    <img class="card-img-top mb-5 mb-md-0" src="<%= product.imageUrl %>" alt="Product image" />
+                </div>
+                <div class="col-md-6">
+                    <h1 class="display-5 fw-bolder"><%= product.title %></h1>
+                    <div class="fs-5 mb-5">
+                        <h5><%= product.price %></h5>
+
+                    </div>
+                    <p class="lead"><%= product.description %></p>
+                    <div class="d-flex">
+                        <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
+                        <button class="btn btn-outline-dark flex-shrink-0" type="button">
+                            <i class="bi-cart-fill me-1"></i>
+                            Add to cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <%- include('layouts/_footer') %>
+</body>
+</html>

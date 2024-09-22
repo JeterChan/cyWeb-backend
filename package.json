@@ -13,6 +13,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express.js": "^1.0.0",
     "mongoose": "^8.5.2",
     "multer": "^1.4.5-lts.1"

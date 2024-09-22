@@ -6,8 +6,12 @@ const ImageModel = require('../models/imageModel');
 // get all product
 const getAllProducts = async (req, res) => {
     try {
-        const products = await roductModel.find();
-        res.status(200).json(products)
+        const products = await ProductModel.find();
+        res.render('home', {
+            title: 'Home page',
+            cartItemCount:10,
+            products:products
+        })
     } catch(error) {
         res.status(500).json({message:error.message})
     }
@@ -20,7 +24,12 @@ const getOneProduct = async (req,res) => {
 
     try {
         const product = await ProductModel.findById(_id).exec();
-        res.status(200).json(product)
+        // res.status(200).json(product)
+        res.render('product_detail', {
+            title:'product_detail',
+            product:product,
+            cartItemCount :10
+        })
     } catch(error) {
         res.status(404).json({message:'Can not find the product'})
     }   

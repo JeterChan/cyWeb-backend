@@ -30,7 +30,12 @@ connection.once("open", () => {
     console.log("mongo connected");
 });
 
+// Set view engine to EJS
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+
 app.use('/api/product', productRouter);
+
 
 app.listen(8080, () => {
     console.log('Server listening on "http://localhost:8080"');
