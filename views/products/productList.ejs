@@ -13,14 +13,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">分類</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="">
-                        <label class="form-check-label">分類 1</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="">
-                        <label class="form-check-label">分類 2</label>
-                    </div>
+                    <% categories.forEach(function(category) { %>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="<%= category.name%>">
+                            <label class="form-check-label"><%= category.name %></label>
+                        </div>
+                    <% }); %>
                 </div>
             </div>
         </div>
@@ -31,7 +29,7 @@
             <% products.forEach(function(product) { %>
                 <div class="col">
                     <div class="card h-100">
-                        <img src="/product/readImages/<%= product.product_id %>" class="card-img-top" alt="<%= product.title %>">
+                        <img src="/api/image/<%= product.product_id %>" class="card-img-top" alt="<%= product.title %>">
                         <div class="card-body">
                             <h5 class="card-title"><%= product.title %></h5>
                             <p class="card-text">NT$ <%= product.price %></p>
@@ -41,5 +39,8 @@
                 </div>
             <% }); %>
         </div>
+        <%- include('../partials/pageNumber') %>
+
     </div>
+
 </div>

@@ -1,7 +1,12 @@
 <!-- views/products/show.ejs -->
 <div class="row">
-    <div class="col-md-6 d-flex justify-content-center">
-        <img src="/product/readImages/<%= product.product_id %>" class="img-fluid" alt="<%= product.title %>">
+    <div class="col-md-6 ">
+        <div class="d-flex align-items-center justify-content-center h-100 py-4">
+            <img src="/api/image/<%= product.product_id %>" 
+                class="img-fluid cursor-pointer product-image"
+                alt="<%= product.title %>"
+                style="max-width: 400px; width: 100%; object-fit: contain;">
+        </div>
     </div>
     <div class="col-md-6">
         <h1><%= product.title %></h1>
@@ -10,7 +15,7 @@
             <label class="form-label">數量</label>
             <input type="number" class="form-control" style="width: 100px" min="1" value="1">
         </div>
-        <button class="btn btn-primary btn-lg">加入購物車</button>
+        <button class="btn btn-primary">加入購物車</button>
         
         <div class="mt-4">
             <h3>商品說明</h3>

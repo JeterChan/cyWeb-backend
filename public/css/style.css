@@ -15,3 +15,13 @@ footer a {
 footer a:hover {
   color: #333;
 }
+
+.cursor-pointer {
+  cursor:pointer;
+}
+
+.product-image {
+  max-height: 400px; /* 設定圖片最大高度 */
+  width: auto;
+  object-fit: contain;
+}
