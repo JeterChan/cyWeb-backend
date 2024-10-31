@@ -19,10 +19,11 @@ const productSchema = new Schema({
     description:{
         type:String,
     },
-    category:{
-        type:Schema.Types.ObjectId,
-        ref:'Category'
+    category: {
+        type: String,
+        default: ""  // 或是你想要的其他預設值
     },
+    
     image:{
         data: Buffer,        // Store the image data as a Buffer
         contentType: String, // Store the image type (e.g., 'image/png', 'image/jpeg')
