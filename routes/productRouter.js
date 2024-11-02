@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const productController = require('../controllers/productController');
+const fs = require('fs');
 
 const multer = require('multer');
 const path = require('path');
+
+// 設定 multer 的儲存配置
+const storage = multer.memoryStorage();
 
 // config multer
 const upload = multer({
@@ -24,10 +28,10 @@ const upload = multer({
 // implement CRUD API
 
 // get all product
-router.get('/', productController.getAllProducts)
+router.get('/', productController.getProductPage)
 
 // get one product
-router.get('/:_id', productController.getOneProduct)
+router.get('/:product_id', productController.getOneProduct)
 
 // create product
 router.post('/', productController.createProduct)
@@ -39,9 +43,9 @@ router.patch('/:_id', productController.updateProduct)
 router.delete('/:_id', productController.deleteProduct)
 
 //upload image
-router.post('/upload', upload.single('image'), productController.uploadImage)
+router.post('/upload', upload.array('image',100), productController.uploadImage)
 
 // read images
-router.get('/readImages/:_id', productController.readImage)
+// router.get('/readImages/:_id', productController.readImage)
 
 module.exports = router;

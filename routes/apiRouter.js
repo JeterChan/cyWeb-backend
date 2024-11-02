@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const emailController = require('../controllers/emailController');
+const imageController = require('../controllers/imageController');
+const categoryController = require('../controllers/categoryController');
 
-// send-email
-router.post('/send-email', emailController.sendEmail);
+// getImage
+router.get('/image/:productId',imageController.getImage);
+
+// add category
+router.post('/addCategory', categoryController.addNewCategory);
 
 module.exports = router;
