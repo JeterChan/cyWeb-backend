@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require("cors");
+const expressLayouts = require('express-ejs-layouts');
 
 // router
 const productRouter = require('./routes/productRouter.js');
@@ -33,8 +34,16 @@ connection.once("open", () => {
 
 // Set view engine to EJS
 app.set('view engine', 'ejs');
+app.use(expressLayouts);
+app.set('layout','layouts/main');
+
+// 設置靜態檔案目錄
 app.use(express.static('public'));
 
+// router path
+app.get('/', (req, res) => {
+    res.redirect('/product');
+});
 app.use('/product', productRouter);
 app.use('/api', apiRouter);
 
