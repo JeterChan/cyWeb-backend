@@ -1,3 +1,4 @@
+/* 保留原有的 CSS 內容 */
 .card-img-top {
   height: 200px;
   object-fit: scale-down;
@@ -17,11 +18,41 @@ footer a:hover {
 }
 
 .cursor-pointer {
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .product-image {
-  max-height: 400px; /* 設定圖片最大高度 */
+  max-height: 400px;
   width: auto;
   object-fit: contain;
+}
+
+/* 新增的 CSS 樣式 */
+.navbar-nav .dropdown-menu {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.navbar-nav .dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.navbar .btn-outline-primary:hover,
+.navbar .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+@media (max-width: 991.98px) {
+  .navbar-nav {
+      margin-bottom: 1rem;
+  }
+  .navbar .d-flex {
+      margin-top: 1rem;
+  }
 }
