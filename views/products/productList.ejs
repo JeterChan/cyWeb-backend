@@ -29,11 +29,11 @@
             <% products.forEach(function(product) { %>
                 <div class="col">
                     <div class="card h-100">
-                        <img src="/api/image/<%= product.product_id %>" class="card-img-top" alt="<%= product.title %>">
+                        <img src="/api/image/<%= product.image %>" class="card-img-top" alt="<%= product.name %>">
                         <div class="card-body">
-                            <h5 class="card-title"><%= product.title %></h5>
-                            <p class="card-text">NT$ <%= product.price %></p>
-                            <a href="/product/<%= product.product_id %>" class="btn btn-primary">查看詳情</a>
+                            <h5 class="card-title"><%= product.name %></h5>
+                            <p class="card-text">NT$ <%= product.basePrice %></p>
+                            <a href="/products/<%= product.productNumber %>" class="btn btn-primary">查看詳情</a>
                         </div>
                     </div>
                 </div>

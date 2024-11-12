@@ -50,11 +50,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:0
     },
     description: {
-      type:DataTypes.JSON,
+      type:DataTypes.STRING,
       defaultValue:null
     },
     specification: {
-      type:DataTypes.JSON,
+      type:DataTypes.STRING,
       defaultValue:null
     },
     state: {

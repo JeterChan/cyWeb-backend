@@ -1,18 +1,18 @@
-const Category = require('../models/categoryModel');
-const SubCategory = require('../models/subCategoryModel')
+const { Category, Subcategory } = require('../db/models');
 
 // create Category
-const addNewCategory = async(req, res) => {
+const createCategory = async(req, res) => {
     
     try {
-        const { name }  = req.body;
+        const { name, slug }  = req.body;
 
-        if (!name) {
+        if (!name || !slug) {
             return res.status(404).json({message:"No Category added."});
         }
 
         const newCategory = await Category.create({
-            name:name
+            name:name,
+            slug:slug
         })
     
         res.status(200).json({
@@ -24,6 +24,90 @@ const addNewCategory = async(req, res) => {
     }
 }
 
+// create Subcategory
+const createSubcategory = async (req, res) => {
+    try {
+        const { category_id, name, slug } = req.body;
+
+        if(!category_id || !name || !slug) {
+            return res.status(404).json({message:"Do not match the necessary information of Subcategory"});
+        }
+
+        const newSubcategory = await Subcategory.create({
+            category_id:category_id,
+            name:name,
+            slug:slug
+        })
+
+        res.status(200).json({
+            message:"Create Subcategory successfully!",
+            Subcategory:newSubcategory
+        });
+    } catch(error) {
+        res.status(500).json({message:error.message});
+    }
+}
+
+// get all category
+const getAllCategory = async(req, res) => {
+    try {
+        const categories = await Category.findAll();
+
+        if(!categories) {
+            return res.status(404).json({
+                status:'error',
+                message:'類別不存在'
+            })
+        }
+
+        res.status(200).json({
+            status:'success',
+            data:categories
+        })
+    } catch (error) {
+        res.status(500).json({
+            status:'error',
+            error:error.message
+        })
+    }
+}
+
+// get subcategories
+const getSubcategories = async (req, res) => {
+    try {
+        const { categoryName } = req.params;
+        const category = await Category.findOne({
+            where:{name:categoryName},
+            include:[{
+                model:Subcategory,
+                as:'subcategories',
+                attributes:['name']
+            }]
+        }); 
+
+        if(!category) {
+            return res.status(404).json({
+                status:'error',
+                message:'此類別未存在'
+            })
+        }
+
+        res.status(200).json({
+            status:'success',
+            data:category,
+            test:category.subcategories[0].name
+        })
+    } catch (error) {
+        res.status(500).json({
+            status:'error',
+            error:error.message
+        })
+    }
+}
+
 module.exports = {
-    addNewCategory
+    createCategory,
+    createSubcategory,
+    getAllCategory,
+    getSubcategories
 };

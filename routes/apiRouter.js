@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const imageController = require('../controllers/imageController');
 const categoryController = require('../controllers/categoryController');
 
-// getImage
-router.get('/image/:productId',imageController.getImage);
-
 // add category
-router.post('/addCategory', categoryController.addNewCategory);
+router.post('/categories', categoryController.createCategory);
+// add subcategory
+router.post('/subcategories', categoryController.createSubcategory);
+// get all category
+router.get('/categories', categoryController.getAllCategory);
+// get subcategories 
+router.get('/subcategories/:categoryName', categoryController.getSubcategories);
 
 module.exports = router;
