@@ -17,7 +17,7 @@
 
         if (startPage > 1) { %>
             <li class="page-item">
-                <a class="page-link" href="?page=1">1</a>
+                <a class="page-link" href="?category=<%= selectedCategory %>&page=1">1</a>
             </li>
             <% if (startPage > 2) { %>
                 <li class="page-item disabled">
@@ -28,7 +28,7 @@
 
         <% for(let i = startPage; i <= endPage; i++) { %>
             <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                <a class="page-link" href="?category=<%= selectedCategory %>&page=<%= i %>"><%= i %></a>
             </li>
         <% } %>
 
@@ -39,12 +39,12 @@
                 </li>
             <% } %>
             <li class="page-item">
-                <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                <a class="page-link" href="?category=<%= selectedCategory %>&page=<%= totalPages %>"><%= totalPages %></a>
             </li>
         <% } %>
 
         <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-            <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+            <a class="page-link" href="?category=<%= selectedCategory %>&page=<%= currentPage + 1 %>" aria-label="Next">
                 <span aria-hidden="true">下一頁</span>
             </a>
         </li>

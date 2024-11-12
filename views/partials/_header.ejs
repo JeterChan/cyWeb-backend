@@ -6,47 +6,38 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <!-- 辦公文具類 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/product?category=office">辦公文具類</a>
-                </li>
-
-                <!-- 展示設備類 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/product?category=display">展示設備類</a>
-                </li>
-
-                <!-- 清潔用品類 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/product?category=cleaning">清潔用品類</a>
-                </li>
-
-                <!-- 五金百貨類 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/product?category=hardware">五金百貨類</a>
-                </li>
-
-                <!-- 教學設備類 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/product?category=teaching">教學設備類</a>
-                </li>
-
-                <!-- 獎品裝飾類 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/product?category=decoration">獎品裝飾類</a>
-                </li>
-
-                <!-- 全部商品 -->
-                <li class="nav-item">
-                    <a class="nav-link" href="/product">全部商品</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        商品分類
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/products?category=office">辦公文具類</a></li>
+                        <li><a class="dropdown-item" href="/products?category=display">展示設備類</a></li>
+                        <li><a class="dropdown-item" href="/products?category=cleaning">清潔用品類</a></li>
+                        <li><a class="dropdown-item" href="/products?category=hardware">五金百貨類</a></li>
+                        <li><a class="dropdown-item" href="/products?category=teaching">教學設備類</a></li>
+                        <li><a class="dropdown-item" href="/products?category=decoration">獎品裝飾類</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/products">全部商品</a></li>
+                    </ul>
                 </li>
             </ul>
 
             <!-- 搜尋表單 -->
-            <form class="d-flex" action="/product/search" method="GET">
+            <form class="d-flex me-2" action="/products/search" method="GET">
                 <input class="form-control me-2" type="search" placeholder="搜尋商品" name="q" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">搜尋</button>
             </form>
+
+            <!-- 登入/註冊按鈕 -->
+            <div class="d-flex">
+                <% if(isAuthenticated) { %>
+                    <a href="/users/logout" class="btn btn-outline-primary">登出</a>
+                <% } else { %>
+                    <a href="/users/login" class="btn btn-outline-primary me-2">登入</a>
+                    <a href="/users/register" class="btn btn-primary">註冊</a>
+                <% } %>
+            </div>
         </div>
     </div>
 </nav>
