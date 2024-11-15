@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('CartItems', {
+    await queryInterface.createTable('Cartitems', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -19,11 +19,11 @@ module.exports = {
         onUpdate:'CASCADE',
         onDelete:'CASCADE'
       },
-      product_variant_id: {
+      product_id: {
         type: Sequelize.INTEGER,
         allowNull:false,
         references:{
-          model:'productvariants',
+          model:'products',
           key:'id'
         },
         onUpdate:'CASCADE',
@@ -44,6 +44,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('CartItems');
+    await queryInterface.dropTable('Cartitems');
   }
 };
