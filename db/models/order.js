@@ -29,11 +29,11 @@ module.exports = (sequelize, DataTypes) => {
   }
   Order.init({
     userId: {
-      type:DataTypes.INTEGER,
+      type:DataTypes.UUID,
       allowNull:false,
       references:{
         model:'users',
-        key:'id'
+        key:'uuid'
       }
     },
     status: {

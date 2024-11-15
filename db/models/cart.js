@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
           foreignKey:'userId',
           as:'user'
         });
-      Cart.hasMany(models.CartItem, {
+      Cart.hasMany(models.Cartitem, {
         foreignKey:'cartId',
         as:'cartItems'
       })
@@ -24,17 +24,22 @@ module.exports = (sequelize, DataTypes) => {
   }
   Cart.init({
     userId: { 
-      type:DataTypes.INTEGER,
-      allowNull:false,
+      type:DataTypes.UUID,
+      defaultValue:DataTypes.UUIDV4,
+      allowNull:true,
       unique:true,
       references: {
         model:'users',
         key:'id'
       }
     },
+    sessionId:{
+      type:DataTypes.STRING,
+      allowNull:true
+    },
     status: {
-      type:DataTypes.ENUM('active','checkout','completed') ,// 活躍, 結帳中, 已完成
-      defaultValue:'active'
+      type:DataTypes.ENUM('guest','user'), // 訪客, 用戶
+      defaultValue:'guest'
     }
   }, {
     sequelize,
