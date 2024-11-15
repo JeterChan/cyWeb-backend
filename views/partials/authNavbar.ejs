@@ -1,0 +1,28 @@
+<!-- auth-navbar.ejs -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">駿英企業社</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#authNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="authNavbar">
+            <ul class="navbar-nav ms-auto">
+                <% if(currentPath === '/users/login') { %>
+                    <li class="nav-item">
+                        <span class="nav-link">還沒有帳號？</span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/users/register" class="btn btn-primary">註冊</a>
+                    </li>
+                <% } else if(currentPath === '/users/register') { %>
+                    <li class="nav-item">
+                        <span class="nav-link">已經有帳號？</span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/users/login" class="btn btn-outline-primary">登入</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>

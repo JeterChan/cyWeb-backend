@@ -33,14 +33,62 @@
                         <div class="card-body">
                             <h5 class="card-title"><%= product.name %></h5>
                             <p class="card-text">NT$ <%= product.basePrice %></p>
-                            <a href="/products/<%= product.productNumber %>" class="btn btn-primary">查看詳情</a>
+                            <div class="d-flex gap-2">
+                                <a href="/products/<%= product.productNumber %>" class="btn btn-primary">查看詳情</a>
+                                <button 
+                                    class="btn btn-success add-to-cart-btn"
+                                    data-product-number="<%= product.productNumber %>"
+                                    data-product-name="<%= product.name %>"
+                                    data-product-price="<%= product.basePrice %>"
+                                >
+                                    加入購物車
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             <% }); %>
         </div>
         <%- include('../partials/pageNumber') %>
-
     </div>
-
 </div>
+
+<!-- 建議在頁面底部添加相關的 JavaScript 代碼 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productNumber = this.dataset.productNumber;
+            const productName = this.dataset.productName;
+            const productPrice = this.dataset.productPrice;
+            
+            // 發送添加到購物車的請求
+            fetch('/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productNumber: productNumber,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('商品已成功加入購物車！');
+                    // 這裡可以更新購物車圖標的數量等
+                } else {
+                    alert('加入購物車失敗，請稍後再試');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('發生錯誤，請稍後再試');
+            });
+        });
+    });
+});
+</script>

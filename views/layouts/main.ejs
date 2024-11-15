@@ -9,7 +9,11 @@
     <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <%- include('../partials/_header') %>
+    <% if (currentPath === '/users/login' || currentPath === '/users/register') { %>
+        <%- include('../partials/authNavbar.ejs') %>
+    <% } else { %>
+        <%- include('../partials/_header') %>
+    <% } %>
 
     <main class="container py-4">
         <%- body %>
