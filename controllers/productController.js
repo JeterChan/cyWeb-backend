@@ -1,4 +1,4 @@
-const { Product, Subcategory, Category } = require('../db/models')
+const { Product, Subcategory, Category, Cart } = require('../db/models')
 const { Op } = require("sequelize");
 
 // get all products
@@ -91,7 +91,9 @@ const getProducts = async(req, res) => {
             categories:categories,
             currentPage,
             totalPages,
-            selectedCategory: categorySlug // 點選分頁的時候可以帶著該分類的slug
+            selectedCategory: categorySlug, // 點選分頁的時候可以帶著該分類的slug
+            isAuthenticated: req.isAuthenticated(),
+            cart:req.user ? req.user.cart : null
         })
 
     } catch(error){

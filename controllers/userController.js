@@ -2,6 +2,17 @@ const { User } = require('../db/models');
 const bcrypt = require('bcrypt');
 const {validationResult} = require('express-validator');
 const passport = require('passport');
+const { v4:uuidv4 } = require('uuid');
+
+// get login page
+const getLoginPage = async (req, res) => {
+    res.render('login')
+}
+
+//get register page
+const getRegisterPage = async (req, res) => {
+    res.render('register', {oldInput:null})
+}
 
 // 註冊邏輯
 const register = async (req, res) => {
@@ -42,6 +53,7 @@ const register = async (req, res) => {
         
         // 創建新用戶
         await User.create({
+            id:uuidv4(),
             email:email,
             password:hashedPassword
         });
@@ -62,7 +74,7 @@ const register = async (req, res) => {
         });
     }
 }
-
+// 登出
 const logout = async (req, res) => {
     req.logout((err) => {
         if(err) { return next(err); }
@@ -74,4 +86,6 @@ const logout = async (req, res) => {
 module.exports = {
     register,
     logout,
+    getLoginPage,
+    getRegisterPage
 }

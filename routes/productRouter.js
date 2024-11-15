@@ -9,4 +9,7 @@ router.get('/', productController.getProducts)
 // get one product
 router.get('/:productNumber', productController.getOneProduct)
 
+// add product to cart
+router.post('/addProduct',)
+
 module.exports = router;
