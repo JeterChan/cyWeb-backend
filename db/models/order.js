@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
   Order.init({
     userId: {
       type:DataTypes.UUID,
-      allowNull:false,
+      allowNull:true,
       references:{
         model:'users',
         key:'uuid'
@@ -58,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
         min:0
       }
     }, 
-    discountAmout: {
+    discountAmount: {
       type:DataTypes.DECIMAL(10,2),
       defaultValue:0,
       allowNull:false,
@@ -76,7 +76,7 @@ module.exports = (sequelize, DataTypes) => {
         min:0
       }
     },
-    totalAmout: {
+    totalAmount: {
       type:DataTypes.DECIMAL(10,2),
       allowNull:false,
       validate:{

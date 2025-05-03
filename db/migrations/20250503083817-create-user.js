@@ -1,47 +1,47 @@
 'use strict';
-
-const { UUIDV4 } = require('sequelize');
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('users', {
       id: {
         type: Sequelize.UUID,
-        defaultValue:Sequelize.UUIDV4,
-        primaryKey:true
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true
       },
       name: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: true
       },
       email: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false
       },
       password: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false
       },
       role: {
-        type: Sequelize.ENUM('user','admin'),
-        defaultValue:'user'
+        type: Sequelize.ENUM('user', 'admin'),
+        defaultValue: 'user'
       },
       phone: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: true
       },
       created_at: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updated_at: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('users');
   }
 };

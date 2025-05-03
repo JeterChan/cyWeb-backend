@@ -2,42 +2,49 @@
 const {
   Model
 } = require('sequelize');
+
+const PAYMENT_METHODS = ['credit_card', 'bank_transfer', 'digital_payment'];
+const PAYMENT_STATUSES = ['pending', 'processing', 'completed', 'failed', 'refunded'];
+
 module.exports = (sequelize, DataTypes) => {
   class Payment extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
       Payment.belongsTo(models.Order, {
-        foreignKey:'orderId',
-        as:'order'
+        foreignKey: 'orderId',
+        as: 'order'
       });
     }
   }
+
   Payment.init({
     orderId: {
-      type:DataTypes.INTEGER,
-      allowNull:false,
-      references:{
-        model:'orders',
-        key:'id'
-      }
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'orders',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
     paymentNumber: {
-      type:DataTypes.STRING,
-      allowNull:false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     paymentMethod: {
-      type:DataTypes.ENUM('credit_card', 'bank_transfer', 'digital_payment'),
-      allowNull:false
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isIn: [PAYMENT_METHODS]
+      }
     },
-    status:{
-      type:DataTypes.ENUM('pending', 'processing', 'completed', 'failed', 'refunded'),
-      defaultValue:'pending',
-      allowNull:false
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'pending',
+      validate: {
+        isIn: [PAYMENT_STATUSES]
+      }
     },
     paymentDetails: DataTypes.JSON
   }, {
@@ -45,5 +52,6 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Payment',
     underscored: true,
   });
+
   return Payment;
 };
