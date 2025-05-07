@@ -1,8 +1,7 @@
-const redis = require('redis')
+const redis = require('redis');
 
-const client = redis.createClient({
-    host:'localhost',
-    port:6379
-})
+const client = redis.createClient();
+
+client.connect().catch(console.error); // v4 需要明確 connect()
 
 module.exports = client

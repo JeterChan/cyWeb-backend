@@ -1,24 +1,17 @@
-const session = require('express-session')
-const connectRedis = require('connect-redis')
-const RedisStore = connectRedis(session)
-const client = require('../config/redis')
-
-// if version is 6 or below, should write connectRedis(session)
+const session = require('express-session');
+const {RedisStore} = require('connect-redis');
+const client = require('../config/redis');  
 
 module.exports = session({
-    store:new RedisStore({
-        client:client,
-        ttl:60 * 60
-    }),
-    secret:'cyWeb_secret',
-    saveUninitialized:false,
-    resave:false,
-    name:'sessionId',
-    cookie:{
-        secure:false, // when deploy, need to change it to true, to accept https only
-        httpOnly:true, // if true, prevent client side JS from reading the cookie
-        // maxAge: // session max age in millsecond
-        sameSite:'strict',
-    },
-    rolling:true // 每次請求更新過期時間
-})
+  store: new RedisStore({ client, prefix: 'sess:' }),
+  secret: 'cyWeb_secret',
+  resave: false,
+  saveUninitialized: false,
+  name: 'sessionId',
+  cookie: {
+    secure: false,
+    httpOnly: true,
+    sameSite: 'strict',
+  },
+  rolling: true,
+});
