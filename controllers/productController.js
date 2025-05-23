@@ -275,10 +275,57 @@ const deleteProduct = async (req, res) => {
     }
 }
 
+// get product EDM
+const getProductsEDM = async (req, res) => {
+    const { page } = req.params; // it shoulds be A,B,C ...
+    // 去 db 撈 productNumber 為 ${page} 開頭的商品
+    const products = await Product.findAll({
+        where:{
+            productNumber: {
+                [Op.like]:`${page}%`
+            }
+        }
+    })
+
+    const imagePath = `EDM-2025-03-${page}.jpg`;
+    res.render('products/product',{
+        productImage:imagePath,
+        products:products
+    });
+}
+
+// post: upload images
+const uploadImage = async (req, res) => {
+    // 將 image 儲存在 CDN
+    // MVP 階段先在 diskstorage
+    try {
+        console.log(req.files);
+
+        if(req.body && req.files) {
+            return res.status(200).json({
+                status:'success',
+                message:'upload success'
+            })
+        } else {
+            return res.status(404).json({
+                status:'error',
+                message:'Please upload again'
+            })
+        }
+    } catch (error) {
+        res.status(500).json({
+            status:'error',
+            message:error.message
+        })
+    }    
+}
+
 module.exports = {
     getProducts,
     getOneProduct,
     createNewProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProductsEDM,
+    uploadImage
 }
