@@ -32,7 +32,9 @@
             <!-- 登入/註冊按鈕 -->
             <div class="d-flex">
                 <% if(isAuthenticated) { %>
-                    <a href="/users/logout" class="btn btn-outline-primary">登出</a>
+                    <form action="/users/logout" method="POST">
+                        <button type="submit" class="btn btn-outline-primary">登出</button>
+                    </form>
                 <% } else { %>
                     <a href="/users/login" class="btn btn-outline-primary me-2">登入</a>
                     <a href="/users/register" class="btn btn-primary">註冊</a>
