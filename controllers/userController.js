@@ -75,17 +75,85 @@ const register = async (req, res) => {
     }
 }
 // 登出
-const logout = async (req, res) => {
+const logout = async (req, res,next) => {
     req.logout((err) => {
         if(err) { return next(err); }
         req.flash('success_msg', '你已經成功登出。')
-        res.redirect('/users/login')
+        req.session.destroy((err) => {
+            if(err) {
+                console.error('Session destroy error:', err);
+                return res.status(500).json({ message: '無法登出，請稍後再試' });
+            }
+        })
+
+        // 清除 cookie data
+        res.clearCookie('sessionId', {
+            path:'/',
+            httpOnly:true,
+            sameSite:'strict',
+            secure:false // deploy 要改成 true
+        })
+        
+        return res.redirect('/users/login')
     });
 }
+// 登入
+const loginUser = async(req, res, next) => {
+    // 保存原本的 cartId, 防止 session 重新生成時丟失
+    const originalCartId = req.session.cartId;
+
+    passport.authenticate('local', async (err, user, info) => {
+        try {
+            // 處理驗證過程中的錯誤, server error
+            if(err) {
+                console.error('Authentication error:', err);
+                req.flash('error_msg','登入過程發現錯誤，請稍後再試');
+                return res.redirect('/users/login');
+            }
+
+            // 驗證失敗, 404
+            if(!user) {
+                req.flash(info.type, info.message);
+                return res.redirect('/users/login');
+            }
+
+            // 驗證成功, 建立用戶 session
+            req.logIn(user, async (loginError) => {
+                if(loginError) {
+                    console.error('Login session error:', loginError);
+                    req.flash('error_msg', '登入過程發生錯誤，請稍後再試');
+                    return res.redirect('/users/login');
+                }
+
+                try {
+                    // 恢復 cartId
+                    if(originalCartId) {
+                        req.session.cartId = originalCartId;
+                        console.log(req.session.cartId);
+                    }
+
+                    // 處理購物車合併
+
+                    res.redirect('/');
+                } catch (cartError) {
+                    console.error('Cart merge error:', cartError);
+                    // 即使購物車合併失敗，也讓用戶成功登入
+                    req.flash('warning_msg', '登入成功, 但購物車合併發生問題');
+                    req.redirect('/');
+                }
+            });
+        } catch (error) {
+            console.error('Login controller error:', error);
+            req.flash('error_msg', '系統錯誤，請稍後再試');
+            res.redirect('/users/login');
+        }
+    })(req, res, next); // 給 passport.authticate() 回傳函式需要用的參數
+};
 
 module.exports = {
     register,
     logout,
     getLoginPage,
-    getRegisterPage
+    getRegisterPage,
+    loginUser
 }

@@ -3,8 +3,8 @@ const {RedisStore} = require('connect-redis');
 const client = require('../config/redis');  
 
 module.exports = session({
-  store: new RedisStore({ client, prefix: 'sess:' }),
-  secret: 'cyWeb_secret',
+  store: new RedisStore({ client, ttl: 60 * 60, logErrors:true }),
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   name: 'sessionId',
@@ -12,6 +12,6 @@ module.exports = session({
     secure: false,
     httpOnly: true,
     sameSite: 'strict',
-  },
-  rolling: true,
+    maxAge: 1000 * 60 * 60, // 1 小時
+  }
 });

@@ -43,7 +43,9 @@ module.exports = app => {
     })
     passport.deserializeUser(async (id, done) => {
         try {
-            const user = await User.findByPk(id);
+            const user = await User.findByPk(id, (err,user) => {
+                done(err,user); // 若找不到該 user, 回傳 error
+            });
             done(null, user.toJSON());
         } catch (error) {
             done(error, null)
