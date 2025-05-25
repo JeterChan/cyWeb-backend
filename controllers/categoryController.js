@@ -34,7 +34,7 @@ const createSubcategory = async (req, res) => {
         }
 
         const newSubcategory = await Subcategory.create({
-            category_id:category_id,
+            categoryId:category_id,
             name:name,
             slug:slug
         })
