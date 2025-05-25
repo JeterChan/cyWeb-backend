@@ -19,7 +19,8 @@ const registerValidation = [
         })
 ];
 
-const authenticator = (req, res, next) => {
+// middleware: 檢查是否登入
+const ensureAuthenticated = (req, res, next) => {
     if(req.isAuthenticated()) {
         return next()
     }
@@ -27,7 +28,16 @@ const authenticator = (req, res, next) => {
     res.redirect('/users/login')
 }
 
+// middleware: 檢查是否未登入
+const ensureGuest = (req, res, next) => {
+    if(!req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/')
+}
+
 module.exports = {
     registerValidation,
-    authenticator
+    ensureAuthenticated,
+    ensureGuest
 };
