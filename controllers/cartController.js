@@ -23,6 +23,7 @@ const addProductToCart = async (req, res) => {
         } else {
             // 若不存在, 則新增商品至購物車
             req.session.cart.push({
+                productId: product.id,
                 productNumber:product.productNumber,
                 name:product.name,
                 price: parseInt(product.basePrice),
