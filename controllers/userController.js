@@ -78,7 +78,6 @@ const register = async (req, res) => {
 const logout = async (req, res,next) => {
     req.logout((err) => {
         if(err) { return next(err); }
-        req.flash('success_msg', '你已經成功登出。')
         req.session.destroy((err) => {
             if(err) {
                 console.error('Session destroy error:', err);
