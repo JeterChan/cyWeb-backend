@@ -11,19 +11,49 @@
 
   <div class="container py-5">
     <h2 class="mb-4">產品目錄</h2>
-
-    <!-- 🌟 圖片 + 表單排版 -->
-    <div class="row">
+    
+    <!-- 🌟 產品目錄選擇器 -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="bg-white p-3 rounded shadow-sm">
+          <h5 class="mb-3">選擇產品目錄</h5>
+          <select class="form-select" id="catalogSelect">
+            <option value="" disabled>請選擇產品目錄</option>
+            <option value="A" <%= (typeof currentPage !== 'undefined' && currentPage === 'A') ? 'selected' : '' %>>目錄 A</option>
+            <option value="B" <%= (typeof currentPage !== 'undefined' && currentPage === 'B') ? 'selected' : '' %>>目錄 B</option>
+            <option value="C" <%= (typeof currentPage !== 'undefined' && currentPage === 'C') ? 'selected' : '' %>>目錄 C</option>
+            <option value="D" <%= (typeof currentPage !== 'undefined' && currentPage === 'D') ? 'selected' : '' %>>目錄 D</option>
+            <option value="E" <%= (typeof currentPage !== 'undefined' && currentPage === 'E') ? 'selected' : '' %>>目錄 E</option>
+            <option value="F" <%= (typeof currentPage !== 'undefined' && currentPage === 'F') ? 'selected' : '' %>>目錄 F</option>
+            <option value="G" <%= (typeof currentPage !== 'undefined' && currentPage === 'G') ? 'selected' : '' %>>目錄 G</option>
+            <option value="H" <%= (typeof currentPage !== 'undefined' && currentPage === 'H') ? 'selected' : '' %>>目錄 H</option>
+            <option value="I" <%= (typeof currentPage !== 'undefined' && currentPage === 'I') ? 'selected' : '' %>>目錄 I</option>
+            <option value="J" <%= (typeof currentPage !== 'undefined' && currentPage === 'J') ? 'selected' : '' %>>目錄 J</option>
+            <option value="K" <%= (typeof currentPage !== 'undefined' && currentPage === 'K') ? 'selected' : '' %>>目錄 K</option>
+            <option value="L" <%= (typeof currentPage !== 'undefined' && currentPage === 'L') ? 'selected' : '' %>>目錄 L</option>
+            <option value="M" <%= (typeof currentPage !== 'undefined' && currentPage === 'M') ? 'selected' : '' %>>目錄 M</option>
+            <option value="N" <%= (typeof currentPage !== 'undefined' && currentPage === 'N') ? 'selected' : '' %>>目錄 N</option>
+            <option value="O" <%= (typeof currentPage !== 'undefined' && currentPage === 'O') ? 'selected' : '' %>>目錄 O</option>
+            <option value="P" <%= (typeof currentPage !== 'undefined' && currentPage === 'P') ? 'selected' : '' %>>目錄 P</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 🌟 目錄內容區域 -->
+    <% if (typeof currentPage !== 'undefined' && currentPage) { %>
+    <!-- 圖片 + 表單排版 -->
+    <div class="row" id="catalogContent">
       <!-- 左側：產品目錄圖片 -->
-        <div class="col-md-8 mb-4 d-flex justify-content-center">
+      <div class="col-md-8 mb-4 d-flex justify-content-center">
         <img
             src="/images/uploads/<%= productImage %>"
-            alt="產品目錄"
+            alt="產品目錄 <%= currentPage %>"
             class="img-fluid shadow rounded"
             style="max-width: 80%; height: auto;"
+            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii0xMCI+5Lit5ZOB55uT6Js/5LiN5a2Y5ZyoPC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIxMCI+UHJvZHVjdCBDYXRhbG9nPC90ZXh0Pjwvc3ZnPg==';"
         >
-        </div>
-
+      </div>
 
       <!-- 右側：加入購物車表單 -->
       <div class="col-md-4">
@@ -33,12 +63,14 @@
             <div class="col-12">
                 <select class="form-select" id="productSelect" required>
                 <option value="" selected disabled>請選擇商品</option>
-                <% products.forEach(product => { %>
+                <% if (typeof products !== 'undefined' && products.length > 0) { %>
+                  <% products.forEach(product => { %>
                     <option value="<%= product.productNumber %>"
-                      data-price = "<%= product.basePrice %>">
+                      data-price="<%= product.basePrice %>">
                     <%= product.name %> (<%= product.productNumber %>)
                     </option>
-                <% }) %>
+                  <% }) %>
+                <% } %>
                 </select>
             </div>
             <!-- 顯示價格 -->
@@ -56,77 +88,14 @@
         </div>
       </div>
     </div>
-
+    <% }%>
+    
     <!-- Toast -->
     <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11;"></div>
   </div>
 
-  <!-- Toast Script -->
-  <script>
-    document.getElementById('quickAddForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const productNumber = document.getElementById('productSelect').value;
-      const quantity = document.getElementById('productQty').value;
+  <!-- Scripts -->
+  <script src="/js/cart.js"></script>
 
-      if (productNumber && quantity > 0) {
-        
-        // TODO: 呼叫 API 加入購物車
-        fetch('/cart', {
-          method:'POST',
-          headers:{
-            'Content-Type':'application/json',
-          },
-          body: JSON.stringify({
-            productNumber:productNumber,
-            quantity:quantity
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if(data.status === 'success'){
-            showToast(`已將 ${productNumber} (${quantity} 件) 加入購物車`);
-          } else {
-            showToast('加入購物車失敗');
-            console.log(data);
-          }
-        })
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const productSelect = document.getElementById('productSelect');
-      const productPrice = document.getElementById('productPrice');
-
-      productSelect.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const price = selectedOption.getAttribute('data-price');
-
-        if (price) {
-          productPrice.textContent = `價格：${price} 元`;
-        } else {
-          productPrice.textContent = '價格：-';
-        }
-      });
-    });
-
-    function showToast(message) {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = 'toast align-items-center text-bg-success border-0 show';
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      toast.innerHTML = `
-        <div class="d-flex">
-          <div class="toast-body">${message}</div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>`;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
-  </script>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

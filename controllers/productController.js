@@ -86,6 +86,10 @@ const getProducts = async(req, res) => {
             })
         }
 
+        // 渲染購物車內容
+        const cart = req.session.cart || [];
+        const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+
         res.render('products/productList', {
             products:products,
             categories:categories,
@@ -93,7 +97,8 @@ const getProducts = async(req, res) => {
             totalPages,
             selectedCategory: categorySlug, // 點選分頁的時候可以帶著該分類的slug
             isAuthenticated: req.isAuthenticated(),
-            cart:req.user ? req.user.cart : null
+            cart:cart,
+            cartItemCount: cartItemCount
         })
 
     } catch(error){
@@ -277,21 +282,44 @@ const deleteProduct = async (req, res) => {
 
 // get product EDM
 const getProductsEDM = async (req, res) => {
-    const { page } = req.params; // it shoulds be A,B,C ...
-    // 去 db 撈 productNumber 為 ${page} 開頭的商品
-    const products = await Product.findAll({
-        where:{
-            productNumber: {
-                [Op.like]:`${page}%`
+    const { page } = req.params; // A, B, C ...
+    // 渲染購物車內容
+    const cart = req.session.cart || [];
+    const cartItemCount = cart.length;
+    const totalItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+    
+    if(!page) {
+        return res.redirect('/products/A');
+    }
+    // 驗證 page 參數
+    if (!/^[A-P]$/.test(page)) {
+        return res.status(404).render('404'); // 或重導至首頁
+    }
+    
+    try {
+        // 去 db 撈 productNumber 為 ${page} 開頭的商品
+        const products = await Product.findAll({
+            where:{
+                productNumber: {
+                    [Op.like]:`${page}%`
+                }
             }
-        }
-    })
+        })
 
-    const imagePath = `EDM-2025-03-${page}.jpg`;
-    res.render('products/product',{
-        productImage:imagePath,
-        products:products
-    });
+        const imagePath = `EDM-2025-03-${page}.jpg`;
+        res.render('products/product',{
+            productImage: imagePath,
+            products: products,
+            currentPage: page,  // 新增這個參數
+            cart: cart,
+            cartItemCount: cartItemCount,
+            totalItemCount: totalItemCount,
+        });
+    } catch (error) {
+        console.error('載入產品目錄時發生錯誤:', error);
+        res.status(500).render('error', { message: '載入失敗' });
+    }
+
 }
 
 // post: upload images
