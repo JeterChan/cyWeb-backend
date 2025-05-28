@@ -1,7 +1,7 @@
 const { Cart, Cartitem, Product } = require('../db/models')
 
 // 購物車 CRUD
-// 將商品加入購物車
+// Post: 將商品加入購物車
 const addProductToCart = async (req, res) => {
     try {
         console.log(req.user);
@@ -34,7 +34,7 @@ const addProductToCart = async (req, res) => {
 
         // 回傳更新後的購物車
         res.status(200).json({
-            status: 'success',
+            success: true,
             message: 'Product added to cart successfully',
             cart: req.session.cart,
             cartItemCount: req.session.cart.length,
@@ -84,6 +84,111 @@ const addProductToCart = async (req, res) => {
     }
 }
 
+// POST: update cart
+const updateCart = async (req, res) => {
+    // 更新商品數量, 當商品數量為1時, 若再按下'-', 則跳出視窗詢問是否要刪除該商品
+    // 針對 req.session.cart 的內容作修改, 若為User,則更新DB
+    try {
+        // 針對 guest 的更新購物車
+        const { productId, quantity } = req.body;
+        const currentCart = req.session.cart;
+        // 找到是針對 req.session.cart 內哪一個 product 做更新
+        // array find method
+        const foundProductIndex = currentCart.findIndex((item) => { return item.productId == productId });
+        if(foundProductIndex != -1) {
+            // 若是減少數量, 會回傳負數
+            // 更新 req.session.cart 內的商品數量
+            currentCart[foundProductIndex].quantity = quantity;
+            if(currentCart[foundProductIndex].quantity === 0) {
+                // 跳出詢問是否要刪除商品的視窗
+
+            }
+            // 將更新後的購物車儲存進 req.session.cart
+            req.session.cart = currentCart;
+            if(req.user) {
+                // 若有登入, 將req.session.cart 儲存進 db
+                const cart = await Cart.findOne({
+                    where:{
+                        userId:req.user.id
+                    }
+                })
+                // update cartItem
+                // 更新 cartItem 的 quantity
+                await Cartitem.update(
+                    { quantity: currentCart[foundProductIndex].quantity},
+                    {
+                        where:{
+                            productId:currentCart[foundProductIndex].productId,
+                            cartId:cart.id
+                        },
+                    },
+                );
+            }
+            // 更新 totalItemCount,cartItemCount
+            res.status(200).json({
+                success:true,
+                message:'Update cart Item successfully',
+                cart:currentCart,
+                cartItemCount:currentCart.length,
+                totalItemCount:currentCart.reduce((total,item) => total + item.quantity, 0)
+            })
+        } else {
+            res.status(404).json({success:false, message:'Can not find the product'});
+        }
+        
+    } catch (error) {
+        console.log('Error:' + error.message);
+        res.status(500).json({message:error.message});
+    }
+} 
+
+// delete: delete cart item
+const deleteCartItem = async(req, res) => {
+    try {
+        const { productId } = req.body;
+        // 刪除 req.session.id 中的 product
+        const currentCart = req.session.cart;
+        const filterCart =  currentCart.filter(item => item.productId != productId);
+        console.log('filterCart:' + filterCart);
+        req.session.cart = filterCart; // 將更新後的 array 指定給 req.session.cart
+        // 若是 user -> 有登入
+        // 將 cartItem 刪除
+        if(req.user) {
+            const userCart = await Cart.findOne({
+                where:{ userId: req.user.id}
+            });
+
+            if(!userCart){
+                res.status(404).json({
+                    success:false,
+                    message:'Can not find the user cart! Please login first'
+                })
+            }
+            
+            // 刪除該cartItem
+            await Cartitem.destroy({
+                where:{ 
+                    cartId: userCart.id,
+                    productId:productId                    
+                }
+            });
+        }; 
+
+        res.status(200).json({
+            success:true,
+            message:'Delete the product successfully!'
+        })
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            success:false,
+            message:error.message
+        })
+    }
+}
 module.exports = {
-    addProductToCart
+    addProductToCart,
+    updateCart,
+    deleteCartItem
 }
