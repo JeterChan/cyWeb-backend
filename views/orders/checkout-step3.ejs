@@ -1,0 +1,118 @@
+<body class="bg-light">
+  <div class="container py-4">
+    <a href="/" class="text-decoration-none mb-3 d-inline-block">← Back to Shop</a>
+    <h2 class="fw-bold mb-4">Complete Your Order</h2>
+
+    <!-- 步驟導引條 -->
+    <div class="d-flex justify-content-between align-items-center mb-4 step-indicator bg-light p-3 rounded">
+      <div class="text-center flex-fill text-success py-2">
+        <i class="bi bi-check-circle-fill fs-4 d-block"></i>
+        Personal Info
+      </div>
+      <div class="text-center flex-fill text-success py-2">
+        <i class="bi bi-check-circle-fill fs-4 d-block"></i>
+        Shipping
+      </div>
+      <div class="text-center flex-fill active-step py-2">
+        <i class="bi bi-credit-card fs-4 d-block"></i>
+        Bank Info
+      </div>
+    </div>
+
+    <form action="/order/submit" method="POST">
+      <div class="row g-4">
+        <!-- 付款方式 -->
+        <div class="col-lg-8">
+          <div class="card p-4">
+            <h5 class="mb-3 fw-bold">Payment Method</h5>
+
+            <div class="mb-3">
+              <label for="paymentMethod" class="form-label">Please select a payment method:</label>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="轉帳" required>
+                <label class="form-check-label" for="bankTransfer">轉帳</label>
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="remittance" value="匯款">
+                <label class="form-check-label" for="remittance">匯款</label>
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="貨到付款">
+                <label class="form-check-label" for="cod">貨到付款</label>
+              </div>
+            </div>
+
+            <!-- 動態顯示區塊 -->
+            <div id="paymentInfo" class="bg-light p-3 rounded border" style="display:none;">
+              <!-- 將由 JS 動態填入內容 -->
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="/order/step2" class="btn btn-outline-secondary">Back</a>
+              <button type="submit" class="btn btn-gradient">Place Order</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 訂單摘要 -->
+        <div class="col-lg-4">
+          <div class="card p-4">
+            <h5 class="fw-bold mb-3">Order Summary</h5>
+            <% cartItems.forEach(item => { %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center">
+                  <!-- <img src="<%# item.imageUrl %>" alt="product image" class="order-img me-2"> -->
+                  <div>
+                    <div><%= item.name %></div>
+                    <small class="text-muted">數量: <%= item.quantity %></small>
+                  </div>
+                </div>
+                <span>$<%= (item.price * item.quantity).toLocaleString() %></span>
+              </div>
+            <% }) %>
+            <hr>
+            <div class="d-flex justify-content-between fw-bold fs-5 mt-2">
+              <span>總計: (<%= cartItems.length %> items)</span>
+              <span>$<%= totalAmount.toLocaleString() %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const radios = document.querySelectorAll('input[name="paymentMethod"]');
+    const infoDiv = document.getElementById('paymentInfo');
+
+    radios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        let html = '';
+        switch (radio.value) {
+          case '轉帳':
+            html = `
+              <p class="text-danger fw-bold">請先完成轉帳後，我們才會安排出貨。</p>
+              <p>銀行名稱：台北富邦商業銀行<br>分行：中壢分行<br>帳號：12345678901234<br>戶名：駿英水果</p>
+            `;
+            break;
+          case '匯款':
+            html = `
+              <p class="text-danger fw-bold">請先完成匯款後，我們才會安排出貨。</p>
+              <p>郵局代碼：700<br>帳號：00412345678901<br>戶名：駿英水果有限公司</p>
+            `;
+            break;
+          case '貨到付款':
+            html = `
+              <p class="text-success">商品將於出貨後 2–3 個工作天送達指定地址。</p>
+            `;
+            break;
+        }
+        infoDiv.innerHTML = html;
+        infoDiv.style.display = 'block';
+      });
+    });
+  </script>
+</body>

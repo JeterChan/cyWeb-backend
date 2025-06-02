@@ -1,0 +1,34 @@
+<body class="bg-light">
+  <div class="container py-5 text-center">
+    <div class="card p-5 shadow-sm">
+      <h2 class="text-success mb-3">🎉 感謝您的訂購！</h2>
+      <p class="fs-5">您的訂單已成功提交，我們會儘快為您處理。</p>
+
+      <div class="my-4">
+        <h5 class="fw-bold">訂單編號</h5>
+        <p class="text-primary fs-4"><%= orderNumber %></p>
+
+        <h5 class="fw-bold mt-4">付款方式</h5>
+        <p><%= paymentMethod %></p>
+
+        <h5 class="fw-bold mt-4">訂單總金額</h5>
+        <p class="fs-4">$<%= totalAmount.toLocaleString() %></p>
+      </div>
+
+      <% if (paymentMethod === '轉帳' || paymentMethod === '匯款') { %>
+        <div class="alert alert-warning mt-4">
+          <strong>請注意：</strong>我們會在確認收到您的付款後安排出貨。
+        </div>
+      <% } else if (paymentMethod === '貨到付款') { %>
+        <div class="alert alert-success mt-4">
+          商品將於出貨後 2–3 個工作天內送達。
+        </div>
+      <% } %>
+
+      <div class="d-grid gap-2 col-6 mx-auto mt-4">
+        <a href="/" class="btn btn-outline-primary">返回首頁</a>
+        <a href="/orders/history" class="btn btn-primary">查看我的訂單</a>
+      </div>
+    </div>
+  </div>
+</body>
