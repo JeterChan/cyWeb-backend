@@ -187,8 +187,36 @@ const deleteCartItem = async(req, res) => {
         })
     }
 }
+
+// remove all cartitems from cart
+const clearCart = async(req,res) => {
+    req.session.cart = []; // 清空購物車
+    // 若有登入則清空 cartItem
+    if(req.user){
+        const cart = await Cart.findOne({ where: { userId: req.user.id }});
+        // 若找不到該 cart, 回傳錯誤
+        if(!cart) {
+            res.status(404).json({
+                success:false,
+                message:"There is no cart"
+            });
+        };
+        // delete 該 cartId 的 cartItem
+        await Cartitem.destroy({
+            where:{
+                cartId:cart.id
+            }
+        })
+    };
+    
+    res.status(200).json({
+        success:true
+    });
+}
+
 module.exports = {
     addProductToCart,
     updateCart,
-    deleteCartItem
+    deleteCartItem,
+    clearCart
 }

@@ -8,4 +8,6 @@ router.post('/', cartController.addProductToCart);
 router.patch('/update', cartController.updateCart);
 // 刪除購物車商品
 router.delete('/remove', cartController.deleteCartItem);
+// 清空購物車商品
+router.delete('/clear', cartController.clearCart);
 module.exports = router
