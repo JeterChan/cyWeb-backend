@@ -15,6 +15,7 @@ const adminRouter = require('./routes/adminRouter.js');
 const apiRouter = require('./routes/apiRouter');
 const userRouter = require('./routes/userRouter');
 const cartRouter = require('./routes/cartRouter');
+const orderRouter = require('./routes/orderRouter.js');
 
 dotenv.config();
 
@@ -44,13 +45,6 @@ app.set('layout','layouts/main');
 // 設置靜態檔案目錄
 app.use(express.static('public'));
 
-
-// 根據目前的路由辨識要顯示的 navbar
-app.use((req, res, next) => {
-    res.locals.currentPath = req.path;
-    next();
-});
-
 // app.use((req, res, next) => {
 //   console.log('session:', req.session.isPopulated);
 //   console.log('user:', req.user);
@@ -73,6 +67,12 @@ app.use('/admin', adminRouter);
 app.use('/api/v1', apiRouter);
 // cart route
 app.use('/cart', cartRouter);
+// order route
+app.use('/order', orderRouter);
+// 404 page
+app.use((req, res, next) => {
+  res.status(404).render('404');
+});
 
 app.listen(8080, () => {
     console.log('Server listening on "http://localhost:8080"');

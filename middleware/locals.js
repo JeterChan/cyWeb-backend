@@ -1,4 +1,5 @@
 module.exports = (req, res, next) => {
+    res.locals.currentPath = req.path;
     res.locals.isAuthenticated = req.isAuthenticated()
     res.locals.user = req.user
     // 設定 success_msg 訊息
