@@ -1,5 +1,5 @@
 const order = require('../db/models/order');
-const { Order, OrderItem } = require('../db/models');
+const { Order, OrderItem, Payment } = require('../db/models');
 const readCheckoutPage = async (req, res) => {
     try {
         // get cartItems
@@ -81,13 +81,14 @@ const getCheckoutSuccess = async(req,res)=>{
         const orderInfo = req.session.orderInformation;
         // test order number
         const orderNumber = 'ORD-' + Date.now();
+        const paymentNumber = 'PAY-' + Date.now();
         const subtotal = cart.reduce((sum, item)=> sum + item.price, 0);
         const shippingFee = 60;
         const discountAmount = 1; // 暫時寫死，未來可根據邏輯調整
         const totalAmount = (subtotal+shippingFee) * discountAmount;
         // 1. 儲存進 databse
         // 建立 order
-        
+        console.log(req.session.orderInformation);
         const newOrder = await Order.create({
             userId:req.user?.id || null,
             orderNumber:orderNumber,
@@ -118,12 +119,33 @@ const getCheckoutSuccess = async(req,res)=>{
                 unitPrice:cartItem.price,
                 subtotal:cartItem.price * cartItem.quantity
             });
-        }));   
-        console.log(req.session.orderInformation);
+        }));
+        // create payment
+        await Payment.create({
+            orderId:newOrder.id,
+            paymentNumber:paymentNumber,
+            paymentMethod:paymentMethod,
+            amount:(subtotal+shippingFee) * discountAmount
+        })
+        
         // 2. 儲存成功後刪除 req.session.cart
         req.session.cart = [];
         req.session.orderInformation = {};
-
+        // 回傳顯示在前端的付款方式
+        let paymentMethodDisplay;
+        switch (paymentMethod) {
+            case 'bank_transfer':
+                paymentMethodDisplay='轉帳'
+                break;
+            case 'remittance':
+                paymentMethodDisplay='匯款'
+                break;
+            case 'cod':
+                paymentMethodDisplay='貨到付款'
+                break;
+            default:
+                break;
+        }
         // 3. sendgrid 寄信給user
         res.render('orders/checkout-success', {
             paymentMethod,
