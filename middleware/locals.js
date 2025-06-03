@@ -1,3 +1,5 @@
+const { getPaymentMethodLabel } = require('../utils/payment')
+
 module.exports = (req, res, next) => {
     res.locals.currentPath = req.path;
     res.locals.isAuthenticated = req.isAuthenticated()
@@ -8,5 +10,9 @@ module.exports = (req, res, next) => {
     res.locals.warning_msg = req.flash('warning_msg')
     // 錯誤訊息
     res.locals.errors = [];
-    next()
+    res.locals.utils = {
+        getPaymentMethodLabel
+    };
+
+    next();
 }
