@@ -1,4 +1,4 @@
-const { Cart, Cartitem, Product } = require('../db/models')
+const { Cart, CartItem, Product } = require('../db/models')
 
 // 購物車 CRUD
 // Post: 將商品加入購物車
@@ -51,14 +51,14 @@ const addProductToCart = async (req, res) => {
                 const newCart = await Cart.create({ userId: req.user.id, status: 'user' });
                 // 將商品加入新購物車
                 // 創建 CartItem
-                await Cartitem.create({
+                await CartItem.create({
                     cartId:newCart.id,
                     productId: product.id,
                     quantity: parseInt(quantity)
                 })
             } else {
                 // 已經有購物車，檢查該商品是否已存在
-                const existingCartItem = await Cartitem.findOne({
+                const existingCartItem = await CartItem.findOne({
                     where:{
                         productId: product.id,
                         cartId: cart.id
@@ -70,8 +70,8 @@ const addProductToCart = async (req, res) => {
                         quantity: existingCartItem.quantity + parseInt(quantity)
                     });
                 } else {
-                    // 若商品不存在，建立新的 Cartitem
-                    await Cartitem.create({
+                    // 若商品不存在，建立新的 CartItem
+                    await CartItem.create({
                         cartId: cart.id,
                         productId: product.id,
                         quantity: parseInt(quantity)
@@ -114,7 +114,7 @@ const updateCart = async (req, res) => {
                 })
                 // update cartItem
                 // 更新 cartItem 的 quantity
-                await Cartitem.update(
+                await CartItem.update(
                     { quantity: currentCart[foundProductIndex].quantity},
                     {
                         where:{
@@ -166,7 +166,7 @@ const deleteCartItem = async(req, res) => {
             }
             
             // 刪除該cartItem
-            await Cartitem.destroy({
+            await CartItem.destroy({
                 where:{ 
                     cartId: userCart.id,
                     productId:productId                    
@@ -202,7 +202,7 @@ const clearCart = async(req,res) => {
             });
         };
         // delete 該 cartId 的 cartItem
-        await Cartitem.destroy({
+        await CartItem.destroy({
             where:{
                 cartId:cart.id
             }

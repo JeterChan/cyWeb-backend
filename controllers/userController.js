@@ -1,4 +1,4 @@
-const { User, Cart, Cartitem,Product } = require('../db/models');
+const { User, Cart, CartItem,Product } = require('../db/models');
 const bcrypt = require('bcrypt');
 const {validationResult} = require('express-validator');
 const passport = require('passport');
@@ -142,7 +142,7 @@ const loginUser = async(req, res, next) => {
                             for(const item of req.session.cart) {
                                 // 檢查購物車內有沒有與 req.session.cart 內一樣的商品
                                 // 若沒有則直接創建新的 cartItem
-                                const [ cartItem, created ] = await Cartitem.findOrCreate({
+                                const [ cartItem, created ] = await CartItem.findOrCreate({
                                     where:{ 
                                         cartId: existingCart.id,
                                         productId:item.productId
@@ -163,7 +163,7 @@ const loginUser = async(req, res, next) => {
                             // 如果 user 沒有購物車, 則將 req.session.cart 中的商品創建新的購物車
                             // 將 req.session.cart 中的商品創建 cartItem, 指定 cartId = newCart.id
                             for(const item of req.session.cart) {
-                                await Cartitem.create({
+                                await CartItem.create({
                                     cartId: existingCart.id,
                                     productId: item.productId,
                                     quantity: item.quantity
@@ -171,7 +171,7 @@ const loginUser = async(req, res, next) => {
                             }
                         }
                         // 將 User 的購物車內容存入 req.session.cart
-                        const cartItems = await Cartitem.findAll({ where: { cartId: existingCart.id}});
+                        const cartItems = await CartItem.findAll({ where: { cartId: existingCart.id}});
                         // 根據 cartItems 撈取 product info
                         const products = await Promise.all(cartItems.map( async (item) => {
                             const product = await Product.findOne({
@@ -192,7 +192,7 @@ const loginUser = async(req, res, next) => {
                         // 單純將 cart 撈取出來放入 req.session.cart, 提供前端渲染
                         const cart = await Cart.findOne({ where: { userId: user.id } });
                         // 撈取 cartItem 的 cartId 為 cart.id
-                        const cartItems = await Cartitem.findAll({ where: { cartId: cart.id}});
+                        const cartItems = await CartItem.findAll({ where: { cartId: cart.id}});
                         // 根據 cartItems 撈取 product info
                         const products = await Promise.all(cartItems.map( async (item) => {
                             const product = await Product.findOne({
