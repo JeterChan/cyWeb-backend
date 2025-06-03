@@ -16,14 +16,22 @@
       </div>
 
       <% if (paymentMethod === '轉帳' || paymentMethod === '匯款') { %>
-        <div class="alert alert-warning mt-4">
-          <strong>請注意：</strong>我們會在確認收到您的付款後安排出貨。
+        <div class="alert alert-warning mt-4 text-start">
+          <strong>請注意：</strong>我們會在確認收到您的付款後安排出貨。<br><br>
+          <strong>轉帳資訊如下：</strong><br>
+          銀行名稱：第一商業銀行 中壢分行<br>
+          銀行代碼：007<br>
+          戶名：駿英企業社<br>
+          銀行帳號：123456789012<br>
+          <br>
+          完成匯款後，請來信告知您的 <strong>帳號末五碼</strong> 及 <strong>訂單編號</strong>，以利我們對帳確認。
         </div>
       <% } else if (paymentMethod === '貨到付款') { %>
         <div class="alert alert-success mt-4">
           商品將於出貨後 2–3 個工作天內送達。
         </div>
       <% } %>
+
 
       <div class="d-grid gap-2 col-6 mx-auto mt-4">
         <a href="/" class="btn btn-outline-primary">返回首頁</a>

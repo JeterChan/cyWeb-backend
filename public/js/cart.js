@@ -1,8 +1,29 @@
+// 1️⃣ 安全讀取 initialCart 資料（從 layout main.ejs 注入的 script）
+let initialCart = [];
+
+const cartDataScript = document.getElementById('initial-cart-data');
+if (cartDataScript) {
+  try {
+    initialCart = JSON.parse(cartDataScript.textContent);
+  } catch (err) {
+    console.error('載入 initialCart 發生錯誤:', err);
+    initialCart = [];
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const catalogSelect = document.getElementById('catalogSelect');
     const productSelect = document.getElementById('productSelect');
     const productPrice = document.getElementById('productPrice');
-    const clearCartBtn = document.getElementById('clear-cart-btn');
+
+    if (Array.isArray(initialCart) && initialCart.length > 0) {
+      const totalItemCount = initialCart.reduce((sum, item) => sum + item.quantity, 0);
+      updateCartUI(initialCart.length, initialCart, totalItemCount);
+      bindClearCartButton();
+    } else {
+      // 若 EJS 頁面一開始就渲染了清空按鈕（但 JS 沒更新過畫面），也需要綁定一次
+      bindClearCartButton();
+    }
 
     // 目錄選擇器變更事件 - 跳轉路由
     catalogSelect.addEventListener('change', function() {
@@ -415,6 +436,29 @@ const showToast = (message, type = 'success') => {
     }, 3000);
 }
 
+function bindClearCartButton() {
+  const clearCartBtn = document.getElementById('clear-cart-btn');
+  if (clearCartBtn) {
+    clearCartBtn.addEventListener('click', async () => {
+      if (!confirm('確定要清空購物車嗎？')) return;
+
+      try {
+        const res = await fetch('/cart/clear', { method: 'DELETE' });
+        if (res.ok) {
+          showToast('購物車已清空', 'success');
+          updateCartUI(0, [], 0); // UI reset
+        } else {
+          showToast('清空購物車失敗', 'danger');
+        }
+      } catch (err) {
+        console.error('清空購物車錯誤:', err);
+        showToast('發生錯誤，請稍後再試', 'danger');
+      }
+    });
+  }
+}
+
+
 /**
  * 更新購物車 UI 顯示
  * 更新購物車徽章、模態框內容和頁腳按鈕
@@ -517,25 +561,7 @@ const updateCartUI = (cartItemCount, cart, totalItemCount) => {
     `;
 
     // 綁定清空購物車按鈕
-    const clearCartBtn = document.getElementById('clear-cart-btn');
-    if (clearCartBtn) {
-      clearCartBtn.addEventListener('click', async () => {
-        if (!confirm('確定要清空購物車嗎？')) return;
-
-        try {
-          const res = await fetch('/cart/clear', { method: 'DELETE' });
-          if (res.ok) {
-            showToast('購物車已清空', 'success');
-            updateCartUI(0, [], 0);
-          } else {
-            showToast('清空購物車失敗', 'danger');
-          }
-        } catch (err) {
-          console.error('清空購物車錯誤:', err);
-          showToast('發生錯誤，請稍後再試', 'danger');
-        }
-      });
-    }
+    bindClearCartButton();
 
   } else {
     // 空購物車處理
