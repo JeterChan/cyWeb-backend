@@ -31,8 +31,11 @@
 
       <%- include('cart') %>
 
-      <div class="d-flex">
-        <% if(isAuthenticated) { %>
+       <div class="d-flex">
+        <% if (isAuthenticated) { %>
+          <% if (user && user.role === 'admin') { %>
+            <a href="/admin/orders" class="btn btn-warning me-2">訂單管理</a>
+          <% } %>
           <form action="/users/logout" method="POST">
             <button type="submit" class="btn btn-outline-primary">登出</button>
           </form>

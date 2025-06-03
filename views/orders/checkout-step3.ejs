@@ -30,17 +30,17 @@
               <label for="paymentMethod" class="form-label">Please select a payment method:</label>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="轉帳" required>
+                <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank_transfer" required>
                 <label class="form-check-label" for="bankTransfer">轉帳</label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="remittance" value="匯款">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="remittance" value="remittance">
                 <label class="form-check-label" for="remittance">匯款</label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="貨到付款">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod">
                 <label class="form-check-label" for="cod">貨到付款</label>
               </div>
             </div>
@@ -92,19 +92,19 @@
       radio.addEventListener('change', () => {
         let html = '';
         switch (radio.value) {
-          case '轉帳':
+          case 'bank_transfer':
             html = `
               <p class="text-danger fw-bold">請先完成轉帳後，我們才會安排出貨。</p>
               <p>銀行名稱：台北富邦商業銀行<br>分行：中壢分行<br>帳號：12345678901234<br>戶名：駿英水果</p>
             `;
             break;
-          case '匯款':
+          case 'remittance':
             html = `
               <p class="text-danger fw-bold">請先完成匯款後，我們才會安排出貨。</p>
               <p>郵局代碼：700<br>帳號：00412345678901<br>戶名：駿英水果有限公司</p>
             `;
             break;
-          case '貨到付款':
+          case 'cod':
             html = `
               <p class="text-success">商品將於出貨後 2–3 個工作天送達指定地址。</p>
             `;
