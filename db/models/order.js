@@ -29,70 +29,97 @@ module.exports = (sequelize, DataTypes) => {
   }
   Order.init({
     userId: {
-      type:DataTypes.UUID,
-      allowNull:true,
-      references:{
-        model:'users',
-        key:'uuid'
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'uuid'
       }
     },
     status: {
-      type:DataTypes.ENUM('pending', 'paid', 'processing', 'completed'),
-      defaultValue:'pending',
-      allowNull:false
+      type: DataTypes.ENUM('pending', 'paid', 'processing', 'completed'),
+      defaultValue: 'pending',
+      allowNull: false
     },
     orderNumber: {
-      type:DataTypes.STRING,
-      allowNull:false
+      type: DataTypes.STRING,
+      allowNull: false
     },
     subtotal: {
-      type:DataTypes.DECIMAL(10,2),
-      allowNull:false
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
     },
-    shippingFee:{
-      type:DataTypes.DECIMAL(10,2),
-      defaultValue:0,
-      allowNull:false,
-      validate:{
-        isDecimal:true,
-        min:0
+    shippingFee: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0,
+      allowNull: false,
+      validate: {
+        isDecimal: true,
+        min: 0
       }
-    }, 
+    },
     discountAmount: {
-      type:DataTypes.DECIMAL(10,2),
-      defaultValue:0,
-      allowNull:false,
-      validate:{
-        isDecimal:true,
-        min:0
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0,
+      allowNull: false,
+      validate: {
+        isDecimal: true,
+        min: 0
       }
     },
     taxAmount: {
-      type:DataTypes.DECIMAL(10,2),
-      defaultValue:0,
-      allowNull:false,
-      validate:{
-        isDecimal:true,
-        min:0
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0,
+      allowNull: false,
+      validate: {
+        isDecimal: true,
+        min: 0
       }
     },
     totalAmount: {
-      type:DataTypes.DECIMAL(10,2),
-      allowNull:false,
-      validate:{
-        isDecimal:true,
-        min:0
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      validate: {
+        isDecimal: true,
+        min: 0
       }
     },
+    company: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    customerName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    customerEmail: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isEmail: true
+      }
+    },
+    customerPhone: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    addressZipCode:{
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    customerAddress: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    invoiceTitle: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    taxId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     notes: DataTypes.TEXT,
-    paidAt: {
-      type:DataTypes.DATE,
-      allowNull:false
-    },
-    completed: {
-      type:DataTypes.DATE,
-      allowNull:false
-    },
   }, {
     sequelize,
     modelName: 'Order',
