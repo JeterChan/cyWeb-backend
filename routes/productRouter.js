@@ -5,7 +5,9 @@ const  upload = require('../middleware/multer');
 
 // implement CRUD API
 // get all product
-router.get('/', productController.getProducts)
+router.get('/', async (req,res) => {
+    res.redirect('products/catalog/A');
+})
 
 // get one product
 router.get('/:productNumber', productController.getOneProduct)

@@ -1,13 +1,16 @@
-const express = require("express");
+// routes/admin.js
+const express = require('express');
 const router = express.Router();
-const productController = require('../controllers/productController');
+const { isAdmin } = require('../middleware/authValidation');
+const adminController = require('../controllers/adminController');
 
-// for admin api
-// 新增商品
-router.post('/products', productController.createNewProduct);
-//更新商品
-router.patch('/products/:productNumber',productController.updateProduct);
-//刪除商品
-router.delete('/products/:productNumber',productController.deleteProduct);
+// 訂單列表頁
+router.get('/orders', isAdmin, adminController.getAdminOrdersPage);
+
+// 單筆訂單詳情頁
+router.get('/orders/:orderNumber', isAdmin, adminController.getOrderDetail);
+
+// 刪除訂單
+router.post('/orders/:orderNumber/status',isAdmin, adminController.updateOrderStatus);
 
 module.exports = router;

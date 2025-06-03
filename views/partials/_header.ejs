@@ -1,139 +1,67 @@
+<% if (!isCheckout) { %>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-        <a class="navbar-brand" href="/">駿英企業社</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        商品分類
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/products?category=office">辦公文具類</a></li>
-                        <li><a class="dropdown-item" href="/products?category=display">展示設備類</a></li>
-                        <li><a class="dropdown-item" href="/products?category=cleaning">清潔用品類</a></li>
-                        <li><a class="dropdown-item" href="/products?category=hardware">五金百貨類</a></li>
-                        <li><a class="dropdown-item" href="/products?category=teaching">教學設備類</a></li>
-                        <li><a class="dropdown-item" href="/products?category=decoration">獎品裝飾類</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/products">全部商品</a></li>
-                    </ul>
-                </li>
-            </ul>
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/products/catalog/A">駿英企業社</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            商品分類
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="/products?category=office">辦公文具類</a></li>
+            <li><a class="dropdown-item" href="/products?category=display">展示設備類</a></li>
+            <li><a class="dropdown-item" href="/products?category=cleaning">清潔用品類</a></li>
+            <li><a class="dropdown-item" href="/products?category=hardware">五金百貨類</a></li>
+            <li><a class="dropdown-item" href="/products?category=teaching">教學設備類</a></li>
+            <li><a class="dropdown-item" href="/products?category=decoration">獎品裝飾類</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/products">全部商品</a></li>
+          </ul>
+        </li>
+      </ul>
 
-            <!-- 搜尋表單 -->
-            <form class="d-flex me-2" action="/products/search" method="GET">
-                <input class="form-control me-2" type="search" placeholder="搜尋商品" name="q" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">搜尋</button>
-            </form>
+      <form class="d-flex me-2" action="/products/search" method="GET">
+        <input class="form-control me-2" type="search" placeholder="搜尋商品" name="q" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">搜尋</button>
+      </form>
 
-            <!-- 購物車按鈕 -->
-            <div class="d-flex align-items-center me-2">
-                <button type="button" class="btn btn-outline-warning position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
-                    <i class="fas fa-shopping-cart"></i>
-                    購物車
-                    <% if(typeof cartItemCount !== 'undefined' && cartItemCount > 0) { %>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger <%= (cartItemCount > 0) ? '' : 'd-none' %>">
-                        <%= cartItemCount || '' %>
-                        <span class="visually-hidden">購物車商品數量</span>
-                    </span>
-                    <% } %>
-                </button>
-            </div>
+      <%- include('cart') %>
 
-            <!-- 登入/註冊按鈕 -->
-            <div class="d-flex">
-                <% if(isAuthenticated) { %>
-                    <form action="/users/logout" method="POST">
-                        <button type="submit" class="btn btn-outline-primary">登出</button>
-                    </form>
-                <% } else { %>
-                    <a href="/users/login" class="btn btn-outline-primary me-2">登入</a>
-                    <a href="/users/register" class="btn btn-primary">註冊</a>
-                <% } %>
-            </div>
-        </div>
+       <div class="d-flex">
+        <% if (isAuthenticated) { %>
+          <% if (user && user.role === 'admin') { %>
+            <a href="/admin/orders" class="btn btn-warning me-2">訂單管理</a>
+          <% } %>
+          <form action="/users/logout" method="POST">
+            <button type="submit" class="btn btn-outline-primary">登出</button>
+          </form>
+        <% } else { %>
+          <a href="/users/login" class="btn btn-outline-primary me-2">登入</a>
+          <a href="/users/register" class="btn btn-primary">註冊</a>
+        <% } %>
+      </div>
     </div>
+  </div>
+</nav>
+<% } else { %>
+<!-- ✅ Checkout 精簡版 Header -->
+<nav class="navbar navbar-light bg-white border-bottom shadow-sm">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a class="navbar-brand fw-bold" href="/">駿英企業社</a>
+    <div class="d-flex align-items-center gap-3">
+      <span class="text-muted">結帳流程</span>
+
+      <% if (isAuthenticated) { %>
+        <form action="/users/logout" method="POST" class="d-inline">
+          <button type="submit" class="btn btn-sm btn-outline-primary">登出</button>
+        </form>
+      <% } %>
+    </div>
+  </div>
 </nav>
 
-<!-- 購物車彈出視窗 -->
-<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cartModalLabel">
-                    <i class="fas fa-shopping-cart me-2"></i>購物車
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <% if(typeof cart !== 'undefined' && Array.isArray(cart) && cart.length > 0) { %>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>商品名稱</th>
-                                    <th class="text-center">數量</th>
-                                    <th class="text-end">單價</th>
-                                    <th class="text-end">小計</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% 
-                                let totalPrice = 0;
-                                cart.forEach((item, index) => { 
-                                    let subtotal = item.price * item.quantity;
-                                    totalPrice += subtotal;
-                                %>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <% if(item.image) { %>
-                                                <img src="<%= item.image %>" alt="<%= item.name %>" class="me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                                            <% } %>
-                                            <span><%= item.name %></span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-secondary"><%= item.quantity %></span>
-                                    </td>
-                                    <td class="text-end">NT$ <%= item.price.toLocaleString() %></td>
-                                    <td class="text-end">NT$ <%= subtotal.toLocaleString() %></td>
-                                </tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <%# 總價區域 %> 
-                    <div class="border-top pt-3">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="text-muted mb-1">共 <%= totalItemCount %> 件商品</p>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <h5 class="fw-bold text-primary mb-0">
-                                    總金額: NT$ <%= totalPrice.toLocaleString() %>
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                <% } else { %>
-                    <div class="text-center py-5">
-                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                        <h6 class="text-muted">您的購物車目前是空的</h6>
-                        <p class="text-muted">快去選購您喜歡的商品吧！</p>
-                    </div>
-                <% } %>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
-                <% if(typeof cart !== 'undefined' && Array.isArray(cart) && cart.length > 0) { %>
-                    <a href="/cart" class="btn btn-primary">前往結帳</a>
-                <% } %>
-            </div>
-        </div>
-    </div>
-</div>
+<% } %>

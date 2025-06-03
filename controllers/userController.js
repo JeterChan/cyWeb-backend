@@ -1,4 +1,4 @@
-const { User } = require('../db/models');
+const { User, Cart, CartItem,Product } = require('../db/models');
 const bcrypt = require('bcrypt');
 const {validationResult} = require('express-validator');
 const passport = require('passport');
@@ -99,7 +99,7 @@ const logout = async (req, res,next) => {
 // 登入
 const loginUser = async(req, res, next) => {
     // 保存原本的 cartId, 防止 session 重新生成時丟失
-    const originalCartId = req.session.cartId;
+    const originalCartId = req.session.cart;
 
     passport.authenticate('local', async (err, user, info) => {
         try {
@@ -125,20 +125,98 @@ const loginUser = async(req, res, next) => {
                 }
 
                 try {
+                    // 有以 guest 身分添加商品至購物車
                     // 恢復 cartId
                     if(originalCartId) {
-                        req.session.cartId = originalCartId;
-                        console.log(req.session.cartId);
+                        req.session.cart = originalCartId;
+                        console.log('----------------req.session.cart------------------');
+                        console.log(req.session.cart);
+                        // 處理購物車合併
+                        const [ existingCart, created ] = await Cart.findOrCreate({ 
+                            where: { userId: user.id }, 
+                            defaults: { status: 'user' }
+                        });
+                        // 如果user已經有購物車, 將 res.session.cart 裡面的data儲存進 existingCart
+                        if(!created) {
+                            // 將 req.session.cart 中的商品創建 cartItem, 指定 cartId = existingCart.id
+                            for(const item of req.session.cart) {
+                                // 檢查購物車內有沒有與 req.session.cart 內一樣的商品
+                                // 若沒有則直接創建新的 cartItem
+                                const [ cartItem, created ] = await CartItem.findOrCreate({
+                                    where:{ 
+                                        cartId: existingCart.id,
+                                        productId:item.productId
+                                    },
+                                    defaults:{
+                                        quantity: item.quantity
+                                    }
+                                });
+                                // 如果不是新創立的 cartItem, 則表示購物車內已經有這個商品
+                                // 則增加數量
+                                if(!created) {
+                                    // 增加數量
+                                    cartItem.update({quantity:cartItem.quantity + item.quantity});
+                                }
+                                // 將 req.session.cart 
+                            }
+                        } else {
+                            // 如果 user 沒有購物車, 則將 req.session.cart 中的商品創建新的購物車
+                            // 將 req.session.cart 中的商品創建 cartItem, 指定 cartId = newCart.id
+                            for(const item of req.session.cart) {
+                                await CartItem.create({
+                                    cartId: existingCart.id,
+                                    productId: item.productId,
+                                    quantity: item.quantity
+                                })
+                            }
+                        }
+                        // 將 User 的購物車內容存入 req.session.cart
+                        const cartItems = await CartItem.findAll({ where: { cartId: existingCart.id}});
+                        // 根據 cartItems 撈取 product info
+                        const products = await Promise.all(cartItems.map( async (item) => {
+                            const product = await Product.findOne({
+                                where: { id: item.productId }
+                            });
+                            return {
+                                productId: product.id,
+                                productNumber: product.productNumber,
+                                name: product.name,
+                                price: parseInt(product.basePrice),
+                                quantity: item.quantity
+                            }
+                        }))
+                        // 將 products 放入 session.cart
+                        req.session.cart = products;
+                    } else { // 登入前沒有以 guest 身分添加商品至購物車
+                        // console.log('user: ' + user.id);
+                        // 單純將 cart 撈取出來放入 req.session.cart, 提供前端渲染
+                        const cart = await Cart.findOne({ where: { userId: user.id } });
+                        // 撈取 cartItem 的 cartId 為 cart.id
+                        const cartItems = await CartItem.findAll({ where: { cartId: cart.id}});
+                        // 根據 cartItems 撈取 product info
+                        const products = await Promise.all(cartItems.map( async (item) => {
+                            const product = await Product.findOne({
+                                where: { id: item.productId }
+                            });
+                            return {
+                                productId: product.id,
+                                productNumber: product.productNumber,
+                                name: product.name,
+                                price: parseInt(product.basePrice),
+                                quantity: item.quantity
+                            }
+                        }))
+                        // 將 products 放入 session.cart
+                        req.session.cart = products;
                     }
-
-                    // 處理購物車合併
-
+                    console.log('----------------req.session.cart------------------');
+                    console.log(req.session.cart);
                     res.redirect('/');
                 } catch (cartError) {
                     console.error('Cart merge error:', cartError);
                     // 即使購物車合併失敗，也讓用戶成功登入
                     req.flash('warning_msg', '登入成功, 但購物車合併發生問題');
-                    req.redirect('/');
+                    res.redirect('/');
                 }
             });
         } catch (error) {

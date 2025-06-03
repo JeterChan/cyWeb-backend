@@ -1,0 +1,49 @@
+<div class="container py-5">
+  <h2 class="mb-4">訂單管理</h2>
+
+  <table class="table table-bordered table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>訂單編號</th>
+        <th>顧客</th>
+        <th>金額</th>
+        <th>付款方式</th>
+        <th>狀態</th>
+        <th>建立時間</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% orders.forEach(order => { %>
+        <tr>
+          <td><%= order.orderNumber %></td>
+          <td><%= order.customerName || '訪客' %></td>
+          <td>NT$<%= Math.floor(order.totalAmount).toLocaleString('zh-TW') %></td>
+          <td>
+            <% if (order.payment) { %>
+              <%= utils.getPaymentMethodLabel(order.payment.paymentMethod) %>
+            <% } else { %>
+              <span class="text-muted">未付款</span>
+            <% } %>
+          </td>
+
+          <td>
+            <form action="/admin/orders/<%= order.orderNumber %>/status" method="POST" class="d-flex">
+              <select name="status" class="form-select form-select-sm me-2">
+                <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>處理中</option>
+                <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>已出貨</option>
+                <option value="completed" <%= order.status === 'completed' ? 'selected' : '' %>>已完成</option>
+                <option value="cancel" <%= order.status === 'cancel' ? 'selected' : '' %>>已取消</option>
+              </select>
+              <button class="btn btn-sm btn-primary">更新</button>
+            </form>
+          </td>
+          <td><%= order.createdAt.toLocaleString() %></td>
+          <td>
+            <a href="/admin/orders/<%= order.orderNumber %>" class="btn btn-sm btn-outline-info">詳細</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

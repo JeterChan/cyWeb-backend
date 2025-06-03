@@ -1,0 +1,31 @@
+/* 自訂 Checkout 頁面樣式 */
+
+.step-indicator .active-step {
+  background-color: #e6f7ea;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.step-indicator .text-success i {
+  color: #28a745;
+}
+
+
+.btn-gradient {
+  background: linear-gradient(to right, #a8e063, #fcd56a);
+  color: white;
+  font-weight: bold;
+  border: none;
+}
+
+.btn-gradient:hover {
+  background: linear-gradient(to right, #90d450, #fbbc05);
+  color: white;
+}
+
+.order-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+}
