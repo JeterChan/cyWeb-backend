@@ -6,7 +6,6 @@ const readCheckoutPage = async (req, res) => {
         const cart = req.session.cart; // 購物車陣列
         const totalAmount = cart.reduce((sum,item) => sum + item.price * item.quantity, 0);
         res.render('orders/checkout-step1',{
-            // isCheckout: true,
             cartItems:cart,
             totalAmount:totalAmount
         })
@@ -26,7 +25,7 @@ const getCheckoutStep2 = async(req,res)=>{
         const totalAmount = cart.reduce((sum,item) => sum + item.price * item.quantity, 0);
         req.session.orderInformation = {
             customerInfo:{
-                name:req.body.company || '',
+                company:req.body.company || '',
                 contactPerson:req.body.contactPerson || '',
                 email:req.body.email || '',
                 phone:req.body.phone || '',
@@ -35,7 +34,6 @@ const getCheckoutStep2 = async(req,res)=>{
             }
         };
         res.render('orders/checkout-step2', {
-            // isCheckout: true,
             cartItems:cart,
             totalAmount:totalAmount
         })
@@ -51,12 +49,13 @@ const getCheckoutStep2 = async(req,res)=>{
 const getCheckoutStep3 = async(req,res)=>{
     try {
         // get cartItems
+        const { street, city, zip} = req.body;
         const cart = req.session.cart; // 購物車陣列
         const totalAmount = cart.reduce((sum,item) => sum + item.price * item.quantity, 0);
+        const customerAddress = city + street;
         req.session.orderInformation.delivery = {
-            street:req.body.street || '',
-            city:req.body.city || '',
-            zip:req.body.zip || '',
+            customerAddress:customerAddress,
+            addressZipCode:zip
         };
         res.render('orders/checkout-step3', {
             // isCheckout: true,
@@ -79,6 +78,7 @@ const getCheckoutSuccess = async(req,res)=>{
         req.session.orderInformation.paymentMethod = {
             method:paymentMethod || '',
         };
+        const orderInfo = req.session.orderInformation;
         // test order number
         const orderNumber = 'ORD-' + Date.now();
         const subtotal = cart.reduce((sum, item)=> sum + item.price, 0);
@@ -96,8 +96,14 @@ const getCheckoutSuccess = async(req,res)=>{
             discountAmount:1, // ratio
             taxAmount:0, // 會改
             totalAmount:(subtotal+shippingFee) * discountAmount,
-            paidAt:new Date, // 會改
-            completed:new Date // 會改
+            company:orderInfo.customerInfo.company || null,
+            customerName:orderInfo.customerInfo.contactPerson,
+            customerEmail:orderInfo.customerInfo.email,
+            customerPhone:orderInfo.customerInfo.phone,
+            addressZipCode:orderInfo.delivery.addressZipCode,
+            customerAddress:orderInfo.delivery.customerAddress,
+            invoiceTitle:orderInfo.customerInfo.invoiceTitle || null,
+            taxId:orderInfo.customerInfo.taxId || null,
         });
         if(!newOrder){
             // 訂單儲存失敗
@@ -117,6 +123,8 @@ const getCheckoutSuccess = async(req,res)=>{
         // 2. 儲存成功後刪除 req.session.cart
         req.session.cart = [];
         req.session.orderInformation = {};
+
+        // 3. sendgrid 寄信給user
         res.render('orders/checkout-success', {
             paymentMethod,
             orderNumber,
