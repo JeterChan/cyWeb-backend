@@ -1,4 +1,4 @@
-const { getPaymentMethodLabel } = require('../utils/payment')
+const labelHelpers = require('../utils/labelHelpers')
 
 module.exports = (req, res, next) => {
     res.locals.currentPath = req.path;
@@ -10,9 +10,9 @@ module.exports = (req, res, next) => {
     res.locals.warning_msg = req.flash('warning_msg')
     // 錯誤訊息
     res.locals.errors = [];
-    res.locals.utils = {
-        getPaymentMethodLabel
-    };
+    res.locals.getPaymentMethodLabel = labelHelpers.getPaymentMethodLabel;
+    res.locals.getOrderStatusLabel = labelHelpers.getOrderStatusLabel;
+    res.locals.getPaymentStatusLabel = labelHelpers.getPaymentStatusLabel;
 
     next();
 }

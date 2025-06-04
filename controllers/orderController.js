@@ -1,5 +1,4 @@
-const order = require('../db/models/order');
-const { Order, OrderItem, Payment } = require('../db/models');
+const { Order, OrderItem, Payment, Product } = require('../db/models');
 const readCheckoutPage = async (req, res) => {
     try {
         // get cartItems
@@ -131,29 +130,81 @@ const getCheckoutSuccess = async(req,res)=>{
         // 2. 儲存成功後刪除 req.session.cart
         req.session.cart = [];
         req.session.orderInformation = {};
-        // 回傳顯示在前端的付款方式
-        let paymentMethodDisplay;
-        switch (paymentMethod) {
-            case 'bank_transfer':
-                paymentMethodDisplay='轉帳'
-                break;
-            case 'remittance':
-                paymentMethodDisplay='匯款'
-                break;
-            case 'cod':
-                paymentMethodDisplay='貨到付款'
-                break;
-            default:
-                break;
-        }
         // 3. sendgrid 寄信給user
-        res.render('orders/checkout-success', {
-            paymentMethod,
-            orderNumber,
-            totalAmount
-        })
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.status(500).render('500');
+            }
+
+            res.render('orders/checkout-success', {
+                paymentMethod,
+                orderNumber,
+                totalAmount
+            });
+        });
     } catch (error) {
         console.log(error.message);
+        res.status(500).json({
+            success:false,
+            message:error.message
+        })
+    }
+}
+
+const getOrderhistory = async(req, res) => {
+    try {
+        // 1. 抓取該 user 的所有訂單和訂單內容
+        const orders = await Order.findAll({
+            where:{
+                userId:req.user.id
+            }
+        });
+        
+        res.render('orders/history',{
+            orders:orders
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success:false,
+            message:error.message
+        });
+    }
+}
+
+const getOrderDetail = async(req, res) => {
+    try {
+        const { orderNumber } = req.params;
+        const order = await Order.findOne({
+            where:{orderNumber:orderNumber},
+            include:[
+                {
+                    model:OrderItem,
+                    as:'orderItems',
+                    include:[
+                        {
+                            model:Product,
+                            as:'product'
+                        }
+                    ]
+                },
+                {
+                    model:Payment,
+                    as:'payment'
+                }
+            ],
+        });
+        if(!order) {
+            res.status(404).render('404');
+        };
+        console.log(order.orderItems);
+        res.render('orders/order-detail', {
+            order:order
+        })
+    } catch (error) {
+        console.log(error);
         res.status(500).json({
             success:false,
             message:error.message
@@ -164,5 +215,7 @@ module.exports = {
     readCheckoutPage,
     getCheckoutStep2,
     getCheckoutStep3,
-    getCheckoutSuccess
+    getCheckoutSuccess,
+    getOrderhistory,
+    getOrderDetail
 }
