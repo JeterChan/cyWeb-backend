@@ -1,20 +1,50 @@
 const { Order, Payment, OrderItem,Product } = require('../db/models');
+const { Op } = require('sequelize');
 
 // 訂單列表頁
 const getAdminOrdersPage = async (req, res) => {
     // get order and payment
-    const orders = await Order.findAll({
-        include:[
-            {
-                model:Payment,
-                as:'payment',
-                attributes:['paymentMethod']
-            }
-        ],
-        orders:[['createdAt','DESC']]
+    const status = req.query.status || '';
+    const search = req.query.search || '';
+
+    const where = {};
+    if(status) where.status = status;
+    if(search) {
+        where[Op.or] = [
+            { orderNumber: {[Op.like]: `%${search}%`}},
+            { customerName: {[Op.like]: `%${search}%`}},
+            { company: {[Op.like]: `%${search}%`}}
+        ];
+    }
+
+    // 回傳不同 status 的訂單數量
+    const [orders, totalOrders, processingCount, deliveredCount, completedCount, cancelCount] = await Promise.all([
+        Order.findAll({where,order:[['createdAt','DESC']]}),
+        Order.count(),
+        Order.count({where:{ status: 'processing'}}),
+        Order.count({where:{ status: 'delivered'}}),
+        Order.count({where:{ status: 'completed'}}),
+        Order.count({where:{ status: 'cancel'}})
+    ]);
+
+    res.render('admin/orders', {
+        orders,
+        totalOrders,
+        processingCount,
+        deliveredCount,
+        completedCount,
+        cancelCount,
+        status,
+        search,
+        renderCard:(label,count,color) => `
+        <div class="col-md-2">
+            <div class="order-card text-center">
+            <div>${label}</div>
+            <div class="fs-4 fw-bold text-${color}">${count}</div>
+            </div>
+        </div>
+        `
     });
-    
-    res.render('admin/orders', {orders});
 };
 
 // 單筆訂單詳情頁
