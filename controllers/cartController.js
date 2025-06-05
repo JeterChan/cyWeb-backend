@@ -25,6 +25,7 @@ const addProductToCart = async (req, res) => {
             req.session.cart.push({
                 productId: product.id,
                 productNumber:product.productNumber,
+                spec:product.specification,
                 name:product.name,
                 price: parseInt(product.basePrice),
                 quantity:parseInt(quantity),
