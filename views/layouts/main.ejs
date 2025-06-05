@@ -10,16 +10,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="/css/style.css" rel="stylesheet">
     <link href="/css/checkout.css" rel="stylesheet">
-
+    <link href="/css/admin-orders.css" rel="stylesheet">
 </head>
 <body>
     <% if (currentPath === '/users/login' || currentPath === '/users/register') { %>
         <%- include('../partials/authNavbar.ejs') %>
-    <% } else { %>
-        <%- include('../partials/_header' , { 
-            isCheckout: currentPath.startsWith('/order'),
-            isAuthenticated    
-        }) %>
+    <% } else {
+         const isCheckout = ['/order/checkout', '/order/step1', '/order/step2', '/order/step3'].some(path => currentPath.startsWith(path));
+    %>
+    <%- include('../partials/_header', { 
+        isCheckout,
+        isAuthenticated    
+    }) %>
     <% } %>
 
     <main class="container py-4">

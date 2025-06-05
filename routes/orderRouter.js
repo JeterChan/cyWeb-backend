@@ -10,5 +10,9 @@ router.post('/step2', orderController.getCheckoutStep2);
 router.post('/step3',orderController.getCheckoutStep3);
 // POST: checkout-success page
 router.post('/submit', orderController.getCheckoutSuccess);
+// GET: get order history
+router.get('/history', orderController.getOrderhistory);
+// GET: get order-detail for user
+router.get('/:orderNumber', orderController.getOrderDetail);
 
 module.exports = router;

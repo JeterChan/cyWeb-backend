@@ -35,6 +35,8 @@
         <% if (isAuthenticated) { %>
           <% if (user && user.role === 'admin') { %>
             <a href="/admin/orders" class="btn btn-warning me-2">訂單管理</a>
+          <% } else { %>
+            <a href="/orders/history" class="btn btn-outline-secondary me-2">歷史訂單</a>
           <% } %>
           <form action="/users/logout" method="POST">
             <button type="submit" class="btn btn-outline-primary">登出</button>

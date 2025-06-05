@@ -9,7 +9,7 @@
         <p class="text-primary fs-4"><%= orderNumber %></p>
 
         <h5 class="fw-bold mt-4">付款方式</h5>
-        <p><%= utils.getPaymentMethodLabel(paymentMethod) %></p>
+        <p><%= getPaymentMethodLabel(paymentMethod) %></p>
 
         <h5 class="fw-bold mt-4">訂單總金額</h5>
         <p class="fs-4">$<%= totalAmount.toLocaleString() %></p>
@@ -35,7 +35,9 @@
 
       <div class="d-grid gap-2 col-6 mx-auto mt-4">
         <a href="/" class="btn btn-outline-primary">返回首頁</a>
-        <a href="/orders/history" class="btn btn-primary">查看我的訂單</a>
+        <% if (user) { %>
+          <a href="/orders/history" class="btn btn-primary">查看我的訂單</a>
+        <% } %>
       </div>
     </div>
   </div>
