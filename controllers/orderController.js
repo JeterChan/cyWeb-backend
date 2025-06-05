@@ -1,4 +1,7 @@
 const { Order, OrderItem, Payment, Product } = require('../db/models');
+const { sendOrderEmail } = require('../utils/mailer');
+const { getPaymentMethodLabel } = require('../utils/labelHelpers');
+
 const readCheckoutPage = async (req, res) => {
     try {
         // get cartItems
@@ -127,10 +130,25 @@ const getCheckoutSuccess = async(req,res)=>{
             amount:(subtotal+shippingFee) * discountAmount
         })
         
-        // 2. 儲存成功後刪除 req.session.cart
+        // 2. sendgrid 寄信給user
+        const to = orderInfo.customerInfo.email;
+        const subject = `您的訂單 ${newOrder.orderNumber} 已送出`;
+        const dynamicData = {
+            "orderId": newOrder.orderNumber || "",
+            "company": orderInfo.customerInfo.company || "",
+            "orderDate": newOrder.createdAt || "",
+            "shippingAddress": orderInfo.delivery.customerAddress || "",
+            "paymentMethod": getPaymentMethodLabel(paymentMethod) || "",
+            "notes": newOrder.notes || "",
+            "items": cart ,
+            "totalAmount": newOrder.totalAmount
+        }
+
+        await sendOrderEmail(to,subject, dynamicData);
+        // 3. 儲存成功後刪除 req.session.cart
         req.session.cart = [];
         req.session.orderInformation = {};
-        // 3. sendgrid 寄信給user
+        
         req.session.save((err) => {
             if (err) {
                 console.error('Session save error:', err);
