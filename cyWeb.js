@@ -1,13 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const cors = require("cors");
 const expressLayouts = require('express-ejs-layouts');
 const passportConfig = require('./config/passport');
 const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
 const csurf = require('csurf');
+
+// swagger
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger.js');
 
 // router
 const productRouter = require('./routes/productRouter.js');
@@ -23,7 +26,6 @@ const app = express();
 
 // middleware
 const setLocals = require('./middleware/locals');
-
 
 // use morgan for logging
 app.use(morgan('tiny'))
@@ -45,16 +47,12 @@ app.set('layout','layouts/main');
 // 設置靜態檔案目錄
 app.use(express.static('public'));
 
-// app.use((req, res, next) => {
-//   console.log('session:', req.session.isPopulated);
-//   console.log('user:', req.user);
-//   next();
-// });
-
+// swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // router path
 app.get('/', (req, res) => {
-    res.redirect('/products');
+    res.redirect('/products/catalog/A');
 });
 
 // auth router
@@ -68,7 +66,7 @@ app.use('/api/v1', apiRouter);
 // cart route
 app.use('/cart', cartRouter);
 // order route
-app.use('/order', orderRouter);
+app.use('/orders', orderRouter);
 // 404 page
 app.use((req, res, next) => {
   res.status(404).render('404');
@@ -76,4 +74,5 @@ app.use((req, res, next) => {
 
 app.listen(8080, () => {
     console.log('Server listening on "http://localhost:8080"');
+    console.log('Swagger API docs at http://localhost:8080/api-docs');
 });
