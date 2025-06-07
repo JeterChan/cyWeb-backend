@@ -16,7 +16,7 @@
       <div class="card-body">
         <h5 class="card-title">訂單資訊</h5>
         <p><strong>訂單編號：</strong><%= order.orderNumber %></p>
-        <p><strong>訂單狀態：</strong><%= order.status %></p>
+        <p><strong>訂單狀態：</strong><%= getOrderStatusLabel(order.status) %></p>
         <p><strong>下單時間：</strong><%= order.createdAt.toLocaleString() %></p>
       </div>
     </div>
@@ -39,6 +39,7 @@
           <thead class="table-light">
             <tr>
               <th>商品名稱</th>
+              <th>商品編號</th>
               <th>單價</th>
               <th>數量</th>
               <th>小計</th>
@@ -48,6 +49,8 @@
             <% order.orderItems.forEach(item => { %>
               <tr>
                 <td><%= item.product?.name || '商品已不存在' %></td>
+                <td><%= item.product?.productNumber || '商品已不存在' %></td>
+                <td><%= item.product?.specification || '商品已不存在' %></td>
                 <td>NT$ <%= Math.floor(item.unitPrice).toLocaleString('zh-TW') %></td>
                 <td><%= item.quantity %></td>
                 <td>NT$ <%= Math.floor(item.subtotal).toLocaleString('zh-TW') %></td>
