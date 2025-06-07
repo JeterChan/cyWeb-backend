@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 const {validationResult} = require('express-validator');
 const passport = require('passport');
 const { v4:uuidv4 } = require('uuid');
+const crypto = require('crypto');
+const { sendVerificationEmail } = require('../utils/mailer');
+const { token } = require('morgan');
 
 // get login page
 const getLoginPage = async (req, res) => {
@@ -35,7 +38,16 @@ const register = async (req, res) => {
         const existingUser = await User.findOne({
             where: {email}
         });
-
+        // 已被驗證過, 跳轉到 login 頁面, 並顯示 req.flash
+        if(existingUser && existingUser.isVerified) {
+            req.flash('success_msg', '您的帳號已經驗證過了，請直接登入');
+            return res.redirect('/users/login');
+        } else if(existingUser && !existingUser.isVerified) {
+            // 如果 email 已存在但未驗證，重新寄送驗證信
+            // 顯示 req.flash
+            req.flash('info_msg', '您的帳號尚未驗證，請檢查您的電子郵件以重新寄送驗證信');
+            return res.redirect('users/verify-expired');
+        }
         if (existingUser) {
             return res.render('register' , {
                 errors: [{
@@ -50,18 +62,30 @@ const register = async (req, res) => {
 
         // 密碼加密
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+        // 產生 token
+        const token = crypto.randomBytes(32).toString('hex');
+        // 產生 token_expires_at
+        const now = new Date();
+        // 設定 1 小時候過期
+        const expires = new Date(now.getTime() + 1*60*60*1000);
         // 創建新用戶
         await User.create({
             id:uuidv4(),
             email:email,
-            password:hashedPassword
+            password:hashedPassword,
+            isVerified:false,
+            verification_token:token,
+            token_expires_at:expires
         });
+        // 寄送會員註冊驗證信
+        await sendVerificationEmail(email,token);
 
         // 註冊成功，轉到登入頁面
         // 快閃訊息需要 express-session
-        req.flash('success_msg','註冊成功! 請登入');
-        res.redirect('login');
+        req.flash('success_msg','註冊成功! 請至信箱確認驗證信');
+        res.render('users/register-success', {
+            email: email
+        });
     } catch(error) {
         console.log('註冊錯誤', error);
         res.render('register', {
@@ -74,6 +98,92 @@ const register = async (req, res) => {
         });
     }
 }
+
+// 驗證 token
+const verifyToken = async(req, res) => {
+    try {
+        const { token } = req.params;
+        // 1. 用該 token 去資料庫找user data
+        const user = await User.findOne({ where:{ verification_token:token}});
+        if(!user) {
+            // 沒找到 user
+            res.status(404).render('404');
+        }
+        // 2. verify token 時間
+        const now = new Date();
+        console.log('驗證 token 時間:', now);
+        console.log('驗證 token 過期時間:', user.token_expires_at);
+        if(!user.isVerified && user.token_expires_at < now) {
+            // 超過一小時沒有點擊連結
+            // 跳轉到驗證過期的頁面跳轉到驗證過期的頁面
+            return res.redirect('/users/verify-expired');
+        }
+        // 已經驗證過又點擊連結
+        if(user.isVerified) {
+            req.flash('success_msg', '您的帳號已經驗證過了，請直接登入');
+            console.log(`Path: ${req.path}`);
+            // console.log(`Success messages:`, successMsg);
+            // console.log(`Warning messages:`, warningMsg);
+            return res.redirect('/users/login');
+        }
+
+        // 沒有逾時
+        // 將 user.isVerified = true
+        // 跳轉到 login page
+        user.isVerified = true;
+        await user.save();
+        req.flash('success_msg', '您的帳號已成功驗證，請登入');
+        res.redirect('/users/login')
+        
+    } catch (error) {
+        console.log('驗證錯誤');
+        res.status(500).json({
+            success:false,
+            message:error.message
+        })
+    }
+}
+
+// resned verification token
+const resendVerificationToken = async(req, res) => {
+    try {
+        const { email } = req.body;
+        // 建立新的 token
+        const token = crypto.randomBytes(32).toString('hex');
+        const now = new Date();
+        const token_expires_at = new Date(now.getTime() + 1*60*60*1000);
+        // 更新 token, 也需要更新資料庫
+        const user = await User.findOne({ where: { email } });
+        if(!user) {
+            // 如果沒有找到 user, 則顯示錯誤訊息
+            req.flash('error_msg', '找不到該電子郵件的用戶');
+            return res.redirect('/users/verify-expired');
+        };
+        // 檢查用戶是否已經驗證過
+        if(user.isVerified) {
+            req.flash('success_msg', '您的帳號已經驗證過了，請直接登入');
+            return res.redirect('/users/login');
+        }
+        // 更新用戶的驗證 token 和過期時間
+        user.verification_token = token;
+        user.token_expires_at = token_expires_at;
+        // 儲存user資料
+        await user.save();
+        // 寄送驗證信
+        // 取得用戶的 email
+        // 重新寄驗證信給用戶
+        await sendVerificationEmail(email, token);
+        req.flash('success_msg', '驗證信已重新寄送，請檢查您的電子郵件');
+        return res.redirect('/users/verify-expired'); // 返回原頁面
+
+    } catch (error) {
+        // 處理錯誤
+        console.error('重新寄送驗證信錯誤:', error);
+        req.flash('error_msg', '重新寄送驗證信失敗，請稍後再試');
+        return res.redirect('/users/verify-expired'); // 返回原頁面顯示錯誤
+    }
+}
+
 // 登出
 const logout = async (req, res,next) => {
     req.logout((err) => {
@@ -232,5 +342,7 @@ module.exports = {
     logout,
     getLoginPage,
     getRegisterPage,
-    loginUser
+    loginUser,
+    verifyToken,
+    resendVerificationToken,
 }
