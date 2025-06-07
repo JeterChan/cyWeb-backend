@@ -1,0 +1,11 @@
+ .btn-link-style {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--bs-primary); /* 使用 Bootstrap 的主題藍色 */
+            text-decoration: underline;
+            cursor: pointer;
+}
+.btn-link-style:hover {
+    color: var(--bs-primary-dark); /* 滑鼠懸停時顏色加深 */
+}
