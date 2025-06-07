@@ -79,7 +79,40 @@ const adminController = require('../controllers/adminController');
  *         description: 未授權
  */
 router.get('/orders', isAdmin, adminController.getAdminOrdersPage);
-
+/**
+ * @swagger
+ * /orders/updateStatus:
+ *   get:
+ *     tags: [Admin - Order Management]
+ *     summary: 更新訂單狀態
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [pending, processing, shipped, delivered, cancelled]
+ *       - in: query
+ *         name: orderNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: 訂單狀態更新成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ */
+router.get('/updateStatus', isAdmin, adminController.getOrdersStatus);
 // 單筆訂單詳情頁
 /**
  * @swagger
@@ -156,5 +189,7 @@ router.get('/orders/:orderNumber', isAdmin, adminController.getOrderDetail);
  *         description: 找不到訂單
  */
 router.post('/orders/:orderNumber/status',isAdmin, adminController.updateOrderStatus);
+
+
 
 module.exports = router;
