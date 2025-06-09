@@ -30,6 +30,14 @@ module.exports = app => {
                     message:'信箱或密碼不正確'
                 })
             }
+            // 檢查用戶是否已驗證
+            if(!user.isVerified) {
+                return done(null, false, {
+                    type: 'warning_msg',
+                    message: '請先驗證您的電子郵件地址'
+                })
+            };
+
             // 若密碼相等
             return done(null, user)
         } catch (error) {
@@ -43,9 +51,12 @@ module.exports = app => {
     })
     passport.deserializeUser(async (id, done) => {
         try {
-            const user = await User.findByPk(id, (err,user) => {
-                done(err,user); // 若找不到該 user, 回傳 error
-            });
+            const user = await User.findByPk(id);
+        
+            if (!user) {
+                return done(null, false); // 找不到用戶時回傳 false
+            }
+            
             done(null, user.toJSON());
         } catch (error) {
             done(error, null)
