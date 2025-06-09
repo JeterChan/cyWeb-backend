@@ -1,0 +1,25 @@
+<div class="container py-5 d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="card shadow-sm p-4 p-md-5 text-center" style="max-width: 500px; width: 100%;">
+        <h2 class="text-primary mb-3">🎉 註冊成功！</h2>
+        <p class="fs-5 mb-4 text-muted">感謝您的註冊！</p>
+        <div class="alert alert-info mb-4">
+            <strong>請至您的 Email 信箱點擊驗證連結</strong><br>
+            <span class="small text-muted">（若沒收到信，請檢查垃圾郵件匣）</span>
+        </div>
+        
+        <div class="mt-3">
+            <span class="text-secondary small">如未收到驗證信，</span>
+            <!-- 主要修改開始：將 <a> 連結改為 <form> -->
+            <form action="/users/resend-verification" method="POST" class="d-inline">
+                <!-- 這是關鍵！後端渲染此頁面時，需要將剛註冊用戶的 Email 填入 value 中 -->
+                <input type="hidden" name="email" value=<%= email %> />
+                
+                <!-- 使用一個看起來像連結的按鈕來提交表單 -->
+                <button type="submit" class="btn-link-style small">點此重寄</button>
+            </form>
+            <!-- 主要修改結束 -->
+        </div>
+
+        <a href="/" class="btn btn-outline-primary mt-4 w-100">返回首頁</a>
+    </div>
+</div>

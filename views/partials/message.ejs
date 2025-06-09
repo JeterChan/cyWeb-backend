@@ -1,13 +1,13 @@
 <% if (locals.success_msg && locals.success_msg.length > 0) { %>
   <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= locals.success_msg %>
+    <%= locals.success_msg[0] %>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 <% } %>
     
 <% if (locals.warning_msg && locals.warning_msg.length > 0) { %>
   <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      <%= locals.warning_msg %>
+      <%= locals.warning_msg[0] %>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 <% } %>
