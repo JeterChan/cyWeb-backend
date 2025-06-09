@@ -1,0 +1,94 @@
+/* Product Detail Page Styles */
+
+.product-image {
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    background: white;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: #007bff;
+    color: white;
+}
+
+.quantity-input {
+    width: 80px;
+    text-align: center;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.specification-table {
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.specifications-text {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    line-height: 1.6;
+    color: #495057;
+    white-space: pre-line;
+}
+
+.price-section {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.add-to-cart-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 30px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.product-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
