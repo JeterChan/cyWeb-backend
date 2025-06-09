@@ -61,7 +61,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // router path
 app.get('/', (req, res) => {
-    res.redirect('/products/catalog/A');
+    res.redirect('/products');
 });
 
 // auth router
