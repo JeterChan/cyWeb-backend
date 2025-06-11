@@ -4,3 +4,4 @@ node_modules
 .credentials.*
 .sequelizerc
 dump.rdb
+db_cyweb.dump

@@ -1,0 +1,86 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      # Database configuration
+      - MYSQL_HOST=mysql
+      # Redis configuration
+      - REDIS_HOST=redis
+      - NODE_ENV=production
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./:/app  # 開發時即時重載：掛載整個專案目錄
+      - ./public:/app/public
+      - /app/node_modules
+    networks:
+      - cyweb-network
+    restart: unless-stopped
+
+# mysql 資料庫
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - cyweb-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pMblackman0226#"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 30s
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    
+# redis 快取
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cyweb-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 5s
+      retries: 5
+      interval: 10s
+      start_period: 10s
+    restart: unless-stopped
+
+# 網路配置
+networks:
+  cyweb-network:
+    driver: bridge
+
+# volumes
+volumes:
+  mysql_data:
+    driver: local
+    name: cyweb_mysql_data
+  redis_data:
+    driver: local
+    name: cyweb_redis_data
