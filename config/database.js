@@ -19,7 +19,8 @@ module.exports = {
   },
   production: {
     // 使用 Railway 的 DATABASE_URL
-    uri: process.env.DATABASE_URL,
+    use_env_variable:DATABASE_URL,
+    // uri: process.env.DATABASE_URL,
     ssl: {
       rejectUnauthorized: false
     },
