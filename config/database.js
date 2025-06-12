@@ -25,6 +25,10 @@ module.exports = {
     },
     waitForConnections: true,
     connectionLimit: 20,
-    queueLimit: 0
+    queueLimit: 0,
+    dialect: 'mysql',
+    dialectOptions: {
+      charset: 'utf8mb4'
+    }
   },
 }
