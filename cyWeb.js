@@ -85,5 +85,5 @@ app.use((req, res, next) => {
 
 app.listen(process.env.PORT, () => {
     console.log(`Server listening on "http://localhost:${process.env.PORT}"`);
-    console.log(`Swagger API docs at http://localhost:${process.env.PORT}/api-docs'`);
+    console.log(`Swagger API docs at "http://localhost:${process.env.PORT}/api-docs"`);
 });
