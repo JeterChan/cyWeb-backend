@@ -1,8 +1,10 @@
 const redis = require('redis');
 
+const redisUrl = process.env.REDIS_URL ||'redis://localhost:6379';
+
 const config = {
   production: {
-    url: process.env.REDIS_URL
+    url: redisUrl
   },
   
   development: {
