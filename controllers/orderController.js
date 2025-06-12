@@ -1,4 +1,4 @@
-const { Order, OrderItem, Payment, Product } = require('../db/models');
+const { Order, OrderItem, Payment, Product, Cart ,CartItem} = require('../db/models');
 const { sendOrderEmail } = require('../utils/mailer');
 const { getPaymentMethodLabel } = require('../utils/labelHelpers');
 
@@ -129,6 +129,19 @@ const getCheckoutSuccess = async(req,res)=>{
             paymentMethod:paymentMethod,
             amount:(subtotal+shippingFee) * discountAmount
         })
+
+        // 刪除 cart 和 cartItem 的資料
+        if(req.user) {
+            // 若有登入, 刪除 cartItem
+            const userCart = await Cart.findOne({
+                where: { userId: req.user.id }
+            });
+            await CartItem.destroy({
+                where: {
+                    cartId:userCart.id
+                }
+            })
+        }
         
         // 2. sendgrid 寄信給user
         const to = orderInfo.customerInfo.email;
@@ -148,7 +161,7 @@ const getCheckoutSuccess = async(req,res)=>{
         // 3. 儲存成功後刪除 req.session.cart
         req.session.cart = [];
         req.session.orderInformation = {};
-        
+
         req.session.save((err) => {
             if (err) {
                 console.error('Session save error:', err);
