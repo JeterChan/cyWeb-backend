@@ -74,39 +74,6 @@ app.use('/cart', cartRouter);
 app.use('/orders', orderRouter);
 //test
 app.use('/test', testRouter);
-// 在你的 app.js 中
-const db = require('./models'); // 調整為你的 models 目錄路徑
-
-// 測試 db 對象載入
-app.get('/debug-db-object', async (req, res) => {
-  try {
-    console.log('🔹 檢查 db 對象');
-    
-    // 檢查 sequelize 實例
-    console.log('🔹 Sequelize 實例存在:', !!db.sequelize);
-    console.log('🔹 可用的模型:', Object.keys(db).filter(key => key !== 'sequelize' && key !== 'Sequelize'));
-    
-    // 測試連線
-    await db.sequelize.authenticate();
-    console.log('✅ Sequelize 連線成功');
-    
-    res.json({
-      sequelize: 'OK',
-      models: Object.keys(db).filter(key => key !== 'sequelize' && key !== 'Sequelize'),
-      environment: process.env.NODE_ENV || 'development'
-    });
-  } catch (error) {
-    console.error('❌ db 對象測試失敗:', error);
-    res.status(500).json({ 
-      error: error.message,
-      name: error.name,
-      config: 'check console logs'
-    });
-  }
-});
-
-
-
 // 404 page
 app.use((req, res, next) => {
   res.status(404).render('404');
