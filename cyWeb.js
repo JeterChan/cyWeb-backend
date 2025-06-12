@@ -29,7 +29,9 @@ const app = express();
 // middleware
 const setLocals = require('./middleware/locals');
 
-
+if(process.env.NODE_ENV === 'production'){
+  app.set('trust proxy', 1);
+}
 
 // session config
 app.use(session)
@@ -69,6 +71,19 @@ app.use('/api/v1', apiRouter);
 app.use('/cart', cartRouter);
 // order route
 app.use('/orders', orderRouter);
+app.get('/debug-proxy', (req, res) => {
+  res.json({
+    trustProxy: app.get('trust proxy'),
+    protocol: req.protocol,
+    secure: req.secure,
+    ip: req.ip,
+    ips: req.ips,
+    headers: {
+      'x-forwarded-proto': req.headers['x-forwarded-proto'],
+      'x-forwarded-for': req.headers['x-forwarded-for']
+    }
+  });
+});
 
 app.get('/debug-env', (req, res) => {
   res.json({
