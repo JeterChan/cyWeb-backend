@@ -24,9 +24,6 @@ const userRouter = require('./routes/userRouter');
 const cartRouter = require('./routes/cartRouter');
 const orderRouter = require('./routes/orderRouter.js');
 
-// test
-const testRouter = require('./routes/testRouter.js');
-
 const app = express();
 
 // middleware
@@ -72,8 +69,49 @@ app.use('/api/v1', apiRouter);
 app.use('/cart', cartRouter);
 // order route
 app.use('/orders', orderRouter);
-//test
-app.use('/test', testRouter);
+
+app.get('/debug-env', (req, res) => {
+  res.json({
+    nodeEnv: process.env.NODE_ENV,
+    hasSessionSecret: !!process.env.SESSION_SECRET,
+    hasRedisUrl: !!process.env.REDIS_URL,
+    hasDatabaseUrl: !!process.env.DATABASE_URL,
+    // trustProxy: app.get('trust proxy')
+  });
+});
+
+app.get('/test-ssr-session', (req, res) => {
+  console.log('🔹 SSR Session 完整測試');
+  
+  // 增加訪問計數
+  if (!req.session.visits) {
+    req.session.visits = 0;
+  }
+  req.session.visits++;
+  req.session.lastVisit = new Date();
+  
+  // 檢查 cookie 設置
+  const cookieSettings = {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24
+  };
+  
+  console.log('Session ID:', req.sessionID);
+  console.log('Session 數據:', req.session);
+  console.log('Cookie 設置:', cookieSettings);
+  
+  res.json({
+    success: true,
+    sessionId: req.sessionID,
+    visits: req.session.visits,
+    lastVisit: req.session.lastVisit,
+    cookieSettings,
+    environment: process.env.NODE_ENV,
+    timestamp: new Date()
+  });
+});
 // 404 page
 app.use((req, res, next) => {
   res.status(404).render('404');
