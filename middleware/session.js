@@ -10,7 +10,7 @@ module.exports = session({
   name: 'sessionId',
   cookie: {
     secure: process.env.NODE_ENV === 'production', // 在生產環境中使用 HTTPS
-    httpOnly: true,
+    httpOnly: false,
     sameSite: 'lax',
     maxAge: 1000 * 60 * 60* 24, // 1 天
   }

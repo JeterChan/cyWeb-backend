@@ -103,6 +103,7 @@ function addToCartFromCard(productNumber, productName, quantity, button) {
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include', // 確保包含 cookies
         body: JSON.stringify({
             productNumber: productNumber,
             quantity: quantity
