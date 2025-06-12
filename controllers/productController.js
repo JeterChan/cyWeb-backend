@@ -1,27 +1,11 @@
-const { Product, Subcategory, Category, Cart, db } = require('../db/models')
+const { Product, Subcategory, Category, Cart} = require('../db/models')
 const { Op } = require("sequelize");
 
 // get all products
 // 顯示商品列表
 const getProducts = async(req, res) => {
     try {
-        console.log('🔹 檢查 Product 模型');
-    
-        // 檢查 Product 模型是否存在
-        if (!db.Product) {
-        return res.status(404).json({ 
-            model: 'NOT_FOUND',
-            availableModels: Object.keys(db).filter(key => key !== 'sequelize' && key !== 'Sequelize'),
-            message: 'Product 模型不存在'
-        });
-        }
         
-        console.log('🔹 Product 模型存在');
-        
-        // 測試基本查詢
-        const count = await db.Product.count();
-        console.log('🔹 Product 數量:', count);
-
         // 從查詢參數取得類別的slug
         const categorySlug = req.query.category;
         const subcategorySlug = req.query.subcategory;
