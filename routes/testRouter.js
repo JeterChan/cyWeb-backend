@@ -2,7 +2,7 @@ const express = require('express');
 const Router = express.Router();
 
 const client = require('../config/redis'); // 假設你有一個 redis 配置文件
-const db = require('../db/models'); // 假設你有一個 Sequelize 模型
+const { db } = require('../db/models'); // 假設你有一個 Sequelize 模型
 
 Router.get('/test-simple', (req, res) => {
   console.log('簡單測試端點被調用');
@@ -53,7 +53,7 @@ Router.get('/debug-db-object', async (req, res) => {
 Router.get('/debug-sequelize-config', (req, res) => {
   try {
     const env = process.env.NODE_ENV || 'development';
-    const config = require('./config/database.js')[env]; // 調整路徑
+    const config = require('../config/database.js')[env]; // 調整路徑
     
     console.log('🔧 當前環境:', env);
     console.log('🔧 載入的配置:', {
