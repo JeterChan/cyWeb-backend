@@ -1,0 +1,76 @@
+<div class="container py-4">
+  <a href="/" class="text-decoration-none mb-3 d-inline-block">&larr; 回到首頁 </a>
+  <h2 class="fw-bold mb-4"><i class="bi bi-box"></i> 訂單管理 </h2>
+
+  <!-- 狀態統計卡片 -->
+  <div class="row g-3 mb-4">
+    <%- renderCard('總訂單', totalOrders, 'primary') %>
+    <%- renderCard('處理中', processingCount, 'warning') %>
+    <%- renderCard('已出貨', deliveredCount, 'info') %>
+    <%- renderCard('完成', completedCount, 'success') %>
+    <%- renderCard('取消', cancelCount, 'danger') %>
+  </div>
+
+  <!-- 搜尋 + 篩選 -->
+  <form class="input-group mb-4" method="GET" action="/admin/orders">
+    <input type="text" name="search" class="form-control" placeholder="Search by order ID ,customer or company ..." value="<%= search %>">
+    <select name="status" class="form-select w-auto">
+      <option value="">所有訂單</option>
+      <option value="processing" <%= status === 'processing' ? 'selected' : '' %>>處理中</option>
+      <option value="delivered" <%= status === 'delivered' ? 'selected' : ''%>> 已出貨</option>
+      <option value="completed" <%= status === 'completed' ? 'selected' : '' %>>完成</option>
+      <option value="cancel" <%= status === 'cancel' ? 'selected' : '' %>>取消</option>
+    </select>
+    <button type="submit" class="btn btn-outline-secondary">Filter</button>
+  </form>
+
+  <!-- 訂單列表 -->
+  <% if (orders.length === 0) { %>
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-box fs-1"></i>
+      <h5 class="mt-3">目前沒有任何訂單</h5>
+    </div>
+  <% } else { %>
+    <table class="table table-bordered bg-white shadow-sm">
+      <thead>
+        <tr>
+          <th>訂單編號</th>
+          <th>公司</th>
+          <th>顧客</th>
+          <th>訂單狀態</th>
+          <th>總價</th>
+          <th>訂購日期</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+          <tr>
+            <td><%= order.orderNumber %></td>
+            <td><%= order.company %></td>
+            <td><%= order.customerName %></td>
+            <!-- 在這裡加入狀態下拉與按鈕 -->
+            <td>
+              <form class="d-flex align-items-center update-status-form" data-order-number="<%= order.orderNumber %>">
+                <select name="status" class="form-select form-select-sm me-2">
+                  <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>處理中</option>
+                  <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>已出貨</option>
+                  <option value="completed" <%= order.status === 'completed' ? 'selected' : '' %>>完成</option>
+                  <option value="cancel" <%= order.status === 'cancel' ? 'selected' : '' %>>取消</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-success">更新</button>
+              </form>
+            </td>
+            <td>$<%= Math.floor(order.totalAmount).toLocaleString('zh-TW') %></td>
+            <td><%= new Date(order.createdAt).toLocaleDateString('zh-TW') %></td>
+            <td>
+              <a href="/admin/orders/<%= order.orderNumber %>" class="btn btn-sm btn-outline-primary">查看</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
+
+<script src="/js/orders.js"></script>

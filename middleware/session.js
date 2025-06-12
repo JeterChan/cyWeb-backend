@@ -9,9 +9,9 @@ module.exports = session({
   saveUninitialized: false,
   name: 'sessionId',
   cookie: {
-    secure: false,
+    secure: process.env.NODE_ENV === 'production', // 在生產環境中使用 HTTPS
     httpOnly: true,
-    sameSite: 'strict',
-    maxAge: 1000 * 60 * 60, // 1 小時
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60* 24, // 1 天
   }
 });

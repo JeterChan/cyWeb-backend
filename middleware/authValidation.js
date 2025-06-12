@@ -36,8 +36,21 @@ const ensureGuest = (req, res, next) => {
     res.redirect('/')
 }
 
+// 檢查是否是 admin
+const isAdmin = (req, res, next) => {
+    if(req.isAuthenticated && req.isAuthenticated()){
+        if(req.user && req.user.role === 'admin'){
+            return next(); // 通過驗證
+        }
+        return res.status(403).send('You are not admin');
+    }
+    // 尚未登入
+    res.redirect('/users/login');
+}
+
 module.exports = {
     registerValidation,
     ensureAuthenticated,
-    ensureGuest
+    ensureGuest,
+    isAdmin
 };

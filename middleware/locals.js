@@ -1,4 +1,7 @@
+const labelHelpers = require('../utils/labelHelpers')
+
 module.exports = (req, res, next) => {
+    res.locals.currentPath = req.path;
     res.locals.isAuthenticated = req.isAuthenticated()
     res.locals.user = req.user
     // 設定 success_msg 訊息
@@ -7,5 +10,12 @@ module.exports = (req, res, next) => {
     res.locals.warning_msg = req.flash('warning_msg')
     // 錯誤訊息
     res.locals.errors = [];
-    next()
+    res.locals.getPaymentMethodLabel = labelHelpers.getPaymentMethodLabel;
+    res.locals.getOrderStatusLabel = labelHelpers.getOrderStatusLabel;
+    res.locals.getPaymentStatusLabel = labelHelpers.getPaymentStatusLabel;
+
+    // 商品類別
+    res.locals.getCategoryLabel = labelHelpers.getCategroyLabel;
+
+    next();
 }

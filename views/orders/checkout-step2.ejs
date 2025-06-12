@@ -1,0 +1,78 @@
+<body class="bg-light">
+  <div class="container py-4">
+    <a href="/" class="text-decoration-none mb-3 d-inline-block">← Back to Shop</a>
+    <h2 class="fw-bold mb-4">Complete Your Order</h2>
+
+    <!-- 步驟導引條 -->
+    <div class="d-flex justify-content-between align-items-center mb-4 step-indicator bg-light p-3 rounded">
+      <div class="text-center flex-fill text-success py-2">
+        <i class="bi bi-check-circle-fill fs-4 d-block"></i>
+        Personal Info
+      </div>
+      <div class="text-center flex-fill active-step py-2">
+        <i class="bi bi-geo-alt fs-4 d-block"></i>
+        Shipping
+      </div>
+      <div class="text-center flex-fill text-muted py-2">
+        <i class="bi bi-credit-card fs-4 d-block"></i>
+        Bank Info
+      </div>
+    </div>
+
+    <form action="/orders/step3" method="POST">
+      <div class="row g-4">
+        <!-- 收件地址 -->
+        <div class="col-lg-8">
+          <div class="card p-4">
+            <h5 class="mb-3 fw-bold">Shipping Address</h5>
+
+            <div class="mb-3">
+              <label for="street" class="form-label">地址</label>
+              <input type="text" class="form-control" id="street" name="street" placeholder="123 Main Street" required>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="city" class="form-label">縣市</label>
+                <input type="text" class="form-control" id="city" name="city" placeholder="New York" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="zip" class="form-label">郵遞區號</label>
+                <input type="text" class="form-control" id="zip" name="zip" placeholder="10001" required>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="/orders/step1" class="btn btn-outline-secondary">Back</a>
+              <button type="submit" class="btn btn-gradient">Continue to Bank Info</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 訂單摘要 -->
+        <div class="col-lg-4">
+          <div class="card p-4">
+            <h5 class="fw-bold mb-3">Order Summary</h5>
+            <% cartItems.forEach(item => { %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center">
+                  <!-- <img src="<%# item.imageUrl %>" alt="product image" class="order-img me-2"> -->
+                  <div>
+                    <div><%= item.name %></div>
+                    <small class="text-muted">數量: <%= item.quantity %></small>
+                  </div>
+                </div>
+                <span>$<%= (item.price * item.quantity).toLocaleString() %></span>
+              </div>
+            <% }) %>
+            <hr>
+            <div class="d-flex justify-content-between fw-bold fs-5 mt-2">
+              <span>總計: (<%= cartItems.length %> items):</span>
+              <span>$<%= totalAmount.toLocaleString() %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</body>

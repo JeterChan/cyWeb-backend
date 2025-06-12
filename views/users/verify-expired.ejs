@@ -1,0 +1,23 @@
+<div class="container py-5 d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="card shadow-sm p-4 p-md-5 text-center" style="max-width: 500px; width: 100%;">
+        <h2 class="text-danger mb-3">⚠️ 驗證連結已逾時</h2>
+        <p class="fs-5 mb-4 text-muted">您的驗證連結可能已失效或過期，請輸入您的電子信箱以重新申請驗證信。</p>
+        
+        <!-- 開始表單 -->
+        <form action="/users/resend-verification" method="POST" class="w-100">
+            <!-- 電子信箱輸入欄位 -->
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="emailInput" name="email" placeholder="name@example.com" required />
+                <label for="emailInput">電子信箱</label>
+            </div>
+            
+            <!-- 送出按鈕 -->
+            <button type="submit" class="btn btn-primary w-100 py-2">重寄驗證信</button>
+        </form>
+        
+         <div class="mt-4">
+            <a href="/login" class="text-secondary text-decoration-none me-3">返回登入</a>
+            <a href="/" class="text-secondary text-decoration-none">返回首頁</a>
+        </div>
+    </div>
+</div>

@@ -6,7 +6,8 @@ const { Op } = require("sequelize");
 const getProducts = async(req, res) => {
     try {
         // 從查詢參數取得類別的slug
-        const categorySlug = await req.query.category;
+        const categorySlug = req.query.category;
+        const subcategorySlug = req.query.subcategory;
 
         // 從查詢參數獲取當前頁碼, 若無則為1
         const currentPage = parseInt(req.query.page) || 1;
@@ -14,15 +15,48 @@ const getProducts = async(req, res) => {
 
         let products = [];
         let totalCount = 0;
+        let subcategories = [];
+
+        // 先判斷 subcategory 有無存在
+        // subcategorySlug 存在, 代表 category 必存在
+        // 若選擇某類別的子類別, 左側的篩選器不需要變動, 維持原狀, 因此需要回傳該類別的所有子類別
+        if(subcategorySlug) {
+            // 回傳的 products 是該 subcategory 的所有商品
+            const subcategory = await Subcategory.findOne({
+                where:{slug:subcategorySlug},
+            });
+
+            // 找該 subcategory 的所有商品
+            const {count, rows} = await Product.findAndCountAll({
+                where:{subcategoryId:subcategory.id},
+                limit: perPage,
+                offset: (currentPage - 1) * perPage,
+            })
+
+            products = rows;
+            totalCount = count;
+
+            // 回傳category 的所有子類別
+            categoryWithSub = await Category.findOne({
+                where:{ slug: categorySlug },
+                include:[{
+                    model:Subcategory,
+                    as:'subcategories',
+                    attributes:['id','name','slug']
+                }]
+            });
+
+            subcategories = categoryWithSub.subcategories;
+        }
 
         // 若有指定的 category
-        if(categorySlug) {
+        if(categorySlug && !subcategorySlug) {
             const categoryWithSub = await Category.findOne({
                 where:{slug:categorySlug},
                 include:[{
                     model:Subcategory,
                     as:'subcategories',
-                    attributes:['id']
+                    attributes:['id','name','slug'],
                 }]
             });
 
@@ -35,7 +69,8 @@ const getProducts = async(req, res) => {
             
             // 使用 map 陣列方法提取所有的屬於該 category 的 subcategory id
             const subcategoryIds = categoryWithSub.subcategories.map(sub => sub.id);
-            
+            subcategories = categoryWithSub.subcategories;
+
             // 一次查詢完所有子類別的商品
             // 避免 N+1 問題，多查詢一次，可能會消耗很多時間
             const result = await Product.findAndCountAll({
@@ -62,7 +97,8 @@ const getProducts = async(req, res) => {
 
             products = result.rows;
             totalCount = result.count;
-        } else {
+        } 
+        if(!categorySlug && !subcategorySlug) {
              // 查詢所有商品
             const { count, rows } = await Product.findAndCountAll({
                 limit: perPage,
@@ -80,25 +116,25 @@ const getProducts = async(req, res) => {
         
         // 當沒有找到任何的商品或沒有任何類別的時候代表整個網站都沒東西
         if(products.length === 0) {
-            return res.status(400).json({
-                status:'error',
-                message:'沒有找到符合條件的商品'
-            })
+            req.flash('warning_msg', '沒有找到任何商品，請嘗試其他搜尋條件');
+            return res.redirect('back'); // 或重定向到適當的頁面
         }
 
         // 渲染購物車內容
         const cart = req.session.cart || [];
-        const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
         res.render('products/productList', {
             products:products,
-            categories:categories,
+            categories:categories, // 用於 _header.ejs 的類別選單
+            currentCategory:categorySlug || '',
+            currentSubcategory:subcategorySlug || '',
+            subcategories: subcategories, // 回傳該 category 的所有子類別
             currentPage,
             totalPages,
             selectedCategory: categorySlug, // 點選分頁的時候可以帶著該分類的slug
             isAuthenticated: req.isAuthenticated(),
             cart:cart,
-            cartItemCount: cartItemCount
+            cartItemCount: cart.length
         })
 
     } catch(error){
@@ -125,8 +161,13 @@ const getOneProduct = async(req,res) => {
             where:{productNumber:productNumber}
         });
 
+        // 渲染購物車內容
+        const cart = req.session.cart || [];
+
         res.render('products/productDetail',{
-            product:product
+            product:product,
+            cart:cart,
+            cartItemCount: cart.length,
         })
         
     } catch (error) {
@@ -137,6 +178,47 @@ const getOneProduct = async(req,res) => {
     }
 }
 
+// get category products
+const getCategoryProducts = async (req, res) => {
+    try {
+        const { category } = req.params;
+
+        if(!category) {
+            return res.status(404).render('404');
+        };
+        // 回傳該 category 的 subcategory
+        const categoryWithSub = await Category.findOne({
+            where:{ slug:category },
+            include:[{
+                model:Subcategory,
+                as:'subcategories'
+            }]
+        });
+
+        // 一次查詢, 避免N+1問題
+        // 回傳該類別的所有商品
+        const products = await Product.findAll({
+            where:{
+                subcategoryId:{
+                    [Op.in]:categoryWithSub.subcategories.map(sub => sub.id)
+                }
+            }
+        })
+        
+        
+    } catch (error) {
+        
+    }
+}
+
+// get subcategory products
+const getSubcategoryProducts = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
 // create new product
 const createNewProduct = async (req, res) => {
     try {
@@ -355,5 +437,7 @@ module.exports = {
     updateProduct,
     deleteProduct,
     getProductsEDM,
-    uploadImage
+    uploadImage,
+    getCategoryProducts,
+    getSubcategoryProducts
 }

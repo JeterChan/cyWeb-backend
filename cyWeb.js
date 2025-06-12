@@ -1,13 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const cors = require("cors");
+dotenv.config();
+
 const expressLayouts = require('express-ejs-layouts');
 const passportConfig = require('./config/passport');
 const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
 const csurf = require('csurf');
+const fs = require('fs');
+const path = require('path');
+
+// swagger
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger.js');
 
 // router
 const productRouter = require('./routes/productRouter.js');
@@ -15,17 +22,24 @@ const adminRouter = require('./routes/adminRouter.js');
 const apiRouter = require('./routes/apiRouter');
 const userRouter = require('./routes/userRouter');
 const cartRouter = require('./routes/cartRouter');
-
-dotenv.config();
+const orderRouter = require('./routes/orderRouter.js');
 
 const app = express();
 
 // middleware
 const setLocals = require('./middleware/locals');
 
-
 // use morgan for logging
-app.use(morgan('tiny'))
+// switch(process.env.NODE_ENV) {
+//   case 'development':
+//     app.use(morgan('dev'))
+//     break
+//   case 'production':
+//     const stream = fs.createWriteStream(path.join(__dirname + 'access.log'),{flags:'a'});
+//     app.use(morgan('combined', {stream}));
+//     break  
+// }
+
 // session config
 app.use(session)
 // 初始化並配置 Passport
@@ -44,19 +58,8 @@ app.set('layout','layouts/main');
 // 設置靜態檔案目錄
 app.use(express.static('public'));
 
-
-// 根據目前的路由辨識要顯示的 navbar
-app.use((req, res, next) => {
-    res.locals.currentPath = req.path;
-    next();
-});
-
-// app.use((req, res, next) => {
-//   console.log('session:', req.session.isPopulated);
-//   console.log('user:', req.user);
-//   next();
-// });
-
+// swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // router path
 app.get('/', (req, res) => {
@@ -73,7 +76,14 @@ app.use('/admin', adminRouter);
 app.use('/api/v1', apiRouter);
 // cart route
 app.use('/cart', cartRouter);
+// order route
+app.use('/orders', orderRouter);
+// 404 page
+app.use((req, res, next) => {
+  res.status(404).render('404');
+});
 
-app.listen(8080, () => {
-    console.log('Server listening on "http://localhost:8080"');
+app.listen(process.env.PORT, () => {
+    console.log(`Server listening on "http://localhost:${process.env.PORT}"`);
+    console.log(`Swagger API docs at http://localhost:${process.env.PORT}/api-docs'`);
 });
