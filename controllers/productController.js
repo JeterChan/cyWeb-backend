@@ -1,4 +1,4 @@
-const { Product, Subcategory, Category, Cart } = require('../db/models')
+const { Product, Subcategory, Category, Cart, db } = require('../db/models')
 const { Op } = require("sequelize");
 
 // get all products
