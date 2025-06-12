@@ -1,6 +1,8 @@
 const express = require('express');
 const Router = express.Router();
 
+const client = require('../config/redis'); // 假設你有一個 redis 配置文件
+
 Router.get('/test-simple', (req, res) => {
   console.log('簡單測試端點被調用');
   res.json({ message: 'OK', timestamp: new Date().toISOString() });
