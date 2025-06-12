@@ -30,15 +30,15 @@ const app = express();
 const setLocals = require('./middleware/locals');
 
 // use morgan for logging
-switch(process.env.NODE_ENV) {
-  case 'development':
-    app.use(morgan('dev'))
-    break
-  case 'production':
-    const stream = fs.createWriteStream(path.join(__dirname + 'access.log'),{flags:'a'});
-    app.use(morgan('combined', {stream}));
-    break  
-}
+// switch(process.env.NODE_ENV) {
+//   case 'development':
+//     app.use(morgan('dev'))
+//     break
+//   case 'production':
+//     const stream = fs.createWriteStream(path.join(__dirname + 'access.log'),{flags:'a'});
+//     app.use(morgan('combined', {stream}));
+//     break  
+// }
 
 // session config
 app.use(session)
