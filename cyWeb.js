@@ -24,6 +24,9 @@ const userRouter = require('./routes/userRouter');
 const cartRouter = require('./routes/cartRouter');
 const orderRouter = require('./routes/orderRouter.js');
 
+// test
+const testRouter = require('./routes/testRouter.js');
+
 const app = express();
 
 // middleware
@@ -78,6 +81,8 @@ app.use('/api/v1', apiRouter);
 app.use('/cart', cartRouter);
 // order route
 app.use('/orders', orderRouter);
+//test
+app.use('/test', testRouter);
 // 404 page
 app.use((req, res, next) => {
   res.status(404).render('404');
