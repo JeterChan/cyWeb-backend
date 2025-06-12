@@ -147,21 +147,6 @@ function getSubcategoryDisplayName(subcategorySlug) {
 }
 
 /**
- * 顯示提示訊息 (使用 cart.js 中的 toast 功能)
- * @param {string} message - 訊息內容
- * @param {string} type - 訊息類型
- */
-function showToast(message, type = 'info') {
-    // 檢查是否有 cart.js 的 toast 功能
-    if (typeof window.showToast === 'function') {
-        window.showToast(message, type);
-    } else {
-        // 備用方案：使用 alert
-        alert(message);
-    }
-}
-
-/**
  * 顯示/隱藏載入遮罩
  * @param {boolean} show - 是否顯示
  */

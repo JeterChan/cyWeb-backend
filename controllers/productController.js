@@ -122,7 +122,6 @@ const getProducts = async(req, res) => {
 
         // 渲染購物車內容
         const cart = req.session.cart || [];
-        const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
 
         res.render('products/productList', {
             products:products,
@@ -135,7 +134,7 @@ const getProducts = async(req, res) => {
             selectedCategory: categorySlug, // 點選分頁的時候可以帶著該分類的slug
             isAuthenticated: req.isAuthenticated(),
             cart:cart,
-            cartItemCount: cartItemCount
+            cartItemCount: cart.length
         })
 
     } catch(error){
@@ -162,8 +161,13 @@ const getOneProduct = async(req,res) => {
             where:{productNumber:productNumber}
         });
 
+        // 渲染購物車內容
+        const cart = req.session.cart || [];
+
         res.render('products/productDetail',{
-            product:product
+            product:product,
+            cart:cart,
+            cartItemCount: cart.length,
         })
         
     } catch (error) {
