@@ -1,41 +1,103 @@
-<!-- views/products/show.ejs -->
-<div class="row">
-    <div class="col-md-6 ">
-        <div class="d-flex align-items-center justify-content-center h-100 py-4">
-            <img src="/api/image/<%= product.productNumber %>" 
-                class="img-fluid cursor-pointer product-image"
-                alt="<%= product.name %>"
-                style="max-width: 400px; width: 100%; object-fit: contain;">
+<div class="container my-5">
+    <div class="row">
+        <!-- Product Image Section -->
+        <div class="col-md-6 mb-4">
+            <div class="image-container">
+                <img src="\images\uploads\EDM-1_page-0001.jpg" alt="<%= product.name %>" class="img-fluid product-image w-100">
+                <% if (product.quantity < 10) { %>
+                    <div class="product-badge">庫存不足！</div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Product Information Section -->
+        <div class="col-md-6">
+            <div class="product-info">
+                <!-- Product Name -->
+                <h1 class="display-6 fw-bold text-primary mb-3"><%= product.name %></h1>
+                
+                <!-- Product Number -->
+                <div class="mb-3">
+                    <small class="text-muted">商品編號: <%= product.productNumber %></small>
+                </div>
+                
+                <!-- Product Description -->
+                <div class="mb-4">
+                    <h5 class="text-secondary mb-3">商品描述</h5>
+                    <p class="lead text-muted"><%= product.description %></p>
+                </div>
+
+                <!-- Price Section -->
+                <div class="price-section mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">NT$ <%= product.basePrice.toLocaleString() %></h4>
+                            <small class="opacity-75">單價</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="opacity-75">庫存數量</small>
+                            <h5 class="mb-0 <%= product.quantity < 10 ? 'text-warning' : '' %>">
+                                <%= product.quantity %> 件
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quantity Controls -->
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-3">選擇數量</h6>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn qty-decrease-btn" 
+                                data-product-number="<%= product.productNumber %>"
+                                type="button">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <input type="number" 
+                                class="form-control quantity-input product-qty-input" 
+                                value="1" 
+                                min="1" 
+                                max="<%= product.quantity %>" 
+                                data-product-number="<%= product.productNumber %>">
+                        <button class="quantity-btn qty-increase-btn" 
+                                data-product-number="<%= product.productNumber %>"
+                                type="button">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block">最多可選擇: <%= product.quantity %> 件</small>
+                </div>
+
+                <!-- Add to Cart Button -->
+                <div class="mb-4">
+                    <button class="btn btn-success add-to-cart-btn btn-lg w-100" 
+                            data-product-number="<%= product.productNumber %>"
+                            data-product-name="<%= product.name %>"
+                            data-max-quantity="<%= product.quantity %>">
+                        <i class="bi bi-cart-plus me-2"></i>
+                        加入購物車
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <h1><%= product.name %></h1>
-        <p class="fs-2 text-danger">NT$ <%= product.basePrice %></p>
-        <div class="mb-3">
-            <label class="form-label">數量</label>
-            <input type="number" class="form-control" style="width: 100px" min="1" value="1" max=<%= product.quantity%>>
-        </div>
-        <button class="btn btn-primary">加入購物車</button>
-        
-        <div class="mt-4">
-            <h3>商品說明</h3>
-            <% if(product.description && product.description.length > 0) { %>
-                <p><%= product.description %></p>
-            <% } else { %> 
-                <li class="list-group-item">暫無商品說明</li>
-            <% } %>
-            
-        </div>
-        
-        <div class="mt-4">
-            <h4>商品規格</h4>
-            <ul class="list-group">
-                <% if (product.specification && product.specification.length > 0) { %>
-                    <strong><%= product.specification %></strong>
-                <% } else { %>
-                    <li class="list-group-item">暫無規格信息</li>
-                <% } %>
-            </ul>
+
+    <!-- Specifications Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="specification-table p-4">
+                <h4 class="text-primary mb-4">
+                    <i class="bi bi-gear me-2"></i>商品規格
+                </h4>
+                <div class="specifications-text">
+                    <%= product.specification %>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<!-- Cart.js -->
+<script src="/js/cart.js"></script>

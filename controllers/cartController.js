@@ -177,7 +177,8 @@ const deleteCartItem = async(req, res) => {
 
         res.status(200).json({
             success:true,
-            message:'Delete the product successfully!'
+            message:'Delete the product successfully!',
+            cartItemCount: filterCart.length,
         })
 
     } catch (error) {

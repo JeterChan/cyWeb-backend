@@ -14,5 +14,8 @@ module.exports = (req, res, next) => {
     res.locals.getOrderStatusLabel = labelHelpers.getOrderStatusLabel;
     res.locals.getPaymentStatusLabel = labelHelpers.getPaymentStatusLabel;
 
+    // 商品類別
+    res.locals.getCategoryLabel = labelHelpers.getCategroyLabel;
+
     next();
 }

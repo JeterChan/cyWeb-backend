@@ -35,8 +35,22 @@ const getPaymentStatusLabel = (status) => {
     return map[status] || '未知的付款狀態';
 };
 
+const getCategroyLabel = (category) => {
+    const map = {
+        office:'辦公用品',
+        display:'展示設備類',
+        cleaning:'清潔用品類',
+        hardware:'五金百貨類',
+        teaching:'教學設備類',
+        decoration:'獎品裝飾類'
+    };
+
+    return map[category] || '未知的商品類別';
+}
+
 module.exports = {
     getPaymentMethodLabel,
     getOrderStatusLabel,
-    getPaymentStatusLabel
+    getPaymentStatusLabel,
+    getCategroyLabel
 };

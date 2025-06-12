@@ -1,12 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+dotenv.config();
+
 const expressLayouts = require('express-ejs-layouts');
 const passportConfig = require('./config/passport');
 const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
 const csurf = require('csurf');
+const fs = require('fs');
+const path = require('path');
 
 // swagger
 const swaggerUi = require('swagger-ui-express');
@@ -20,23 +24,21 @@ const userRouter = require('./routes/userRouter');
 const cartRouter = require('./routes/cartRouter');
 const orderRouter = require('./routes/orderRouter.js');
 
-dotenv.config();
-
 const app = express();
 
 // middleware
 const setLocals = require('./middleware/locals');
 
 // use morgan for logging
-switch(process.env.NODE_ENV) {
-  case 'development':
-    app.use(morgan('dev'))
-    break
-  case 'production':
-    const stream = fs.createWriteStream(__dirname + 'access.log',{flags:'a'});
-    app.use(morgan('combined', {stream}));
-    break  
-}
+// switch(process.env.NODE_ENV) {
+//   case 'development':
+//     app.use(morgan('dev'))
+//     break
+//   case 'production':
+//     const stream = fs.createWriteStream(path.join(__dirname + 'access.log'),{flags:'a'});
+//     app.use(morgan('combined', {stream}));
+//     break  
+// }
 
 // session config
 app.use(session)
@@ -61,7 +63,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // router path
 app.get('/', (req, res) => {
-    res.redirect('/products/catalog/A');
+    res.redirect('/products');
 });
 
 // auth router
@@ -81,7 +83,7 @@ app.use((req, res, next) => {
   res.status(404).render('404');
 });
 
-app.listen(8080, () => {
-    console.log('Server listening on "http://localhost:8080"');
-    console.log('Swagger API docs at http://localhost:8080/api-docs');
+app.listen(process.env.PORT, () => {
+    console.log(`Server listening on "http://localhost:${process.env.PORT}"`);
+    console.log(`Swagger API docs at http://localhost:${process.env.PORT}/api-docs'`);
 });

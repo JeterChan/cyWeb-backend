@@ -12,45 +12,358 @@ if (cartDataScript) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const catalogSelect = document.getElementById('catalogSelect');
-    const productSelect = document.getElementById('productSelect');
-    const productPrice = document.getElementById('productPrice');
-
+    // 初始化購物車顯示
     if (Array.isArray(initialCart) && initialCart.length > 0) {
-      const totalItemCount = initialCart.reduce((sum, item) => sum + item.quantity, 0);
-      updateCartUI(initialCart.length, initialCart, totalItemCount);
-      bindClearCartButton();
+        const totalItemCount = initialCart.reduce((sum, item) => sum + item.quantity, 0);
+        updateCartUI(initialCart.length, initialCart, totalItemCount);
+        bindClearCartButton();
     } else {
-      // 若 EJS 頁面一開始就渲染了清空按鈕（但 JS 沒更新過畫面），也需要綁定一次
-      bindClearCartButton();
+        bindClearCartButton();
     }
 
-    // 目錄選擇器變更事件 - 跳轉路由
-    catalogSelect.addEventListener('change', function() {
-        const selectedPage = this.value;
-        if (selectedPage) {           
-            // 跳轉到對應的目錄路由
-            window.location.href = `/products/catalog/${selectedPage}`;
-        }
-    });
-
-    // 產品選擇變更事件
-    if (productSelect) {
-        productSelect.addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
-
-            if (price) {
-                productPrice.textContent = `價格：${price} 元`;
-            } else {
-                productPrice.textContent = '價格：-';
-            }
-        });
-    }
-
+    // 初始化產品卡片功能
+    initializeProductCards();
+    
     // 初始化購物車數量修改功能
     initializeCartQuantityControls();
+    
+    // 初始化產品篩選功能
+    initializeProductFilters();
 });
+
+/**
+ * 初始化產品卡片功能
+ * 為產品卡片的加入購物車按鈕和數量控制添加事件監聽器
+ */
+function initializeProductCards() {
+    // 使用事件委託處理所有產品卡片的按鈕
+    document.addEventListener('click', function(e) {
+        // 處理加入購物車按鈕
+        if (e.target.closest('.add-to-cart-btn')) {
+            const button = e.target.closest('.add-to-cart-btn');
+            const productNumber = button.dataset.productNumber;
+            const productName = button.dataset.productName;
+            const maxStock = parseInt(button.dataset.maxStock);
+            
+            // 獲取該產品的數量
+            const qtyInput = document.querySelector(`.product-qty-input[data-product-number="${productNumber}"]`);
+            const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
+            
+            // 防止重複點擊
+            if (button.disabled) return;
+            
+            // 檢查庫存
+            if (quantity > maxStock) {
+                showToast(`數量不能超過庫存數量 ${maxStock}`, 'warning');
+                return;
+            }
+            
+            // 設置按鈕載入狀態
+            setButtonLoading(button, true);
+            
+            // 加入購物車
+            addToCartFromCard(productNumber, productName, quantity, button);
+        }
+        
+        // 處理數量增加按鈕
+        if (e.target.closest('.qty-increase-btn')) {
+            const button = e.target.closest('.qty-increase-btn');
+            const productNumber = button.dataset.productNumber;
+            handleProductQtyIncrease(productNumber);
+        }
+        
+        // 處理數量減少按鈕
+        if (e.target.closest('.qty-decrease-btn')) {
+            const button = e.target.closest('.qty-decrease-btn');
+            const productNumber = button.dataset.productNumber;
+            handleProductQtyDecrease(productNumber);
+        }
+    });
+    
+    // 監聽數量輸入框的直接輸入
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('product-qty-input')) {
+            const input = e.target;
+            const productNumber = input.dataset.productNumber;
+            validateProductQtyInput(productNumber);
+        }
+    });
+}
+
+/**
+ * 從產品卡片加入購物車
+ * @param {string} productNumber - 商品編號
+ * @param {string} productName - 商品名稱
+ * @param {number} quantity - 數量
+ * @param {HTMLElement} button - 點擊的按鈕元素
+ */
+function addToCartFromCard(productNumber, productName, quantity, button) {
+    fetch('/cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            productNumber: productNumber,
+            quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`已將 ${productName} (${quantity} 件) 加入購物車`, 'success');
+            
+            // 更新購物車 UI
+            updateCartUI(data.cartItemCount, data.cart, data.totalItemCount);
+            
+            // 短暫顯示成功狀態
+            setButtonSuccess(button);
+        } else {
+            showToast(data.message || '加入購物車失敗', 'danger');
+            setButtonLoading(button, false);
+        }
+    })
+    .catch(error => {
+        console.error('加入購物車時發生錯誤:', error);
+        showToast('加入購物車失敗，請稍後再試', 'danger');
+        setButtonLoading(button, false);
+    });
+}
+
+/**
+ * 設置按鈕載入狀態
+ * @param {HTMLElement} button - 按鈕元素
+ * @param {boolean} loading - 是否載入中
+ */
+function setButtonLoading(button, loading) {
+    if (loading) {
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>加入中...';
+    } else {
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-cart-plus"></i> 加入購物車';
+    }
+}
+
+/**
+ * 設置按鈕成功狀態
+ * @param {HTMLElement} button - 按鈕元素
+ */
+function setButtonSuccess(button) {
+    button.innerHTML = '<i class="bi bi-check-lg me-2"></i>已加入';
+    button.classList.remove('btn-success');
+    button.classList.add('btn-outline-success');
+    
+    // 2秒後恢復原狀
+    setTimeout(() => {
+        button.innerHTML = '<i class="bi bi-cart-plus"></i> 加入購物車';
+        button.classList.remove('btn-outline-success');
+        button.classList.add('btn-success');
+        button.disabled = false;
+    }, 2000);
+}
+
+/**
+ * 處理產品卡片數量增加
+ * @param {string} productNumber - 商品編號
+ */
+function handleProductQtyIncrease(productNumber) {
+    const input = document.querySelector(`.product-qty-input[data-product-number="${productNumber}"]`);
+    if (!input) return;
+    
+    const currentQty = parseInt(input.value) || 1;
+    const maxQty = parseInt(input.max) || 99;
+    
+    if (currentQty < maxQty) {
+        input.value = currentQty + 1;
+        // 添加動畫效果
+        input.classList.add('quantity-changed');
+        setTimeout(() => input.classList.remove('quantity-changed'), 200);
+    } else {
+        showToast(`最多只能選擇 ${maxQty} 件`, 'warning');
+        // 按鈕震動效果
+        const button = document.querySelector(`.qty-increase-btn[data-product-number="${productNumber}"]`);
+        button.classList.add('btn-shake');
+        setTimeout(() => button.classList.remove('btn-shake'), 300);
+    }
+}
+
+/**
+ * 處理產品卡片數量減少
+ * @param {string} productNumber - 商品編號
+ */
+function handleProductQtyDecrease(productNumber) {
+    const input = document.querySelector(`.product-qty-input[data-product-number="${productNumber}"]`);
+    if (!input) return;
+    
+    const currentQty = parseInt(input.value) || 1;
+    const minQty = parseInt(input.min) || 1;
+    
+    if (currentQty > minQty) {
+        input.value = currentQty - 1;
+        // 添加動畫效果
+        input.classList.add('quantity-changed');
+        setTimeout(() => input.classList.remove('quantity-changed'), 200);
+    } else {
+        showToast(`最少需要選擇 ${minQty} 件`, 'warning');
+        // 按鈕震動效果
+        const button = document.querySelector(`.qty-decrease-btn[data-product-number="${productNumber}"]`);
+        button.classList.add('btn-shake');
+        setTimeout(() => button.classList.remove('btn-shake'), 300);
+    }
+}
+
+/**
+ * 驗證產品數量輸入
+ * @param {string} productNumber - 商品編號
+ */
+function validateProductQtyInput(productNumber) {
+    const input = document.querySelector(`.product-qty-input[data-product-number="${productNumber}"]`);
+    if (!input) return;
+    
+    let value = parseInt(input.value) || 1;
+    const min = parseInt(input.min) || 1;
+    const max = parseInt(input.max) || 99;
+    
+    // 確保數值在有效範圍內
+    if (value < min) {
+        value = min;
+        showToast(`數量不能少於 ${min}`, 'warning');
+    } else if (value > max) {
+        value = max;
+        showToast(`數量不能超過 ${max}`, 'warning');
+    }
+    
+    input.value = value;
+}
+
+/**
+ * 初始化產品篩選功能
+ * 處理排序和分頁（移除複雜的子類別篩選）
+ */
+function initializeProductFilters() {
+    // 初始化排序功能
+    initializeSortFunction();
+    
+    // 初始化分頁
+    initializePagination();
+    
+    // 初始化子類別按鈕樣式（可選的動畫效果）
+    initializeSubcategoryButtons();
+}
+
+/**
+ * 初始化子類別按鈕樣式和效果
+ */
+function initializeSubcategoryButtons() {
+    const subcategoryButtons = document.querySelectorAll('.subcategory-buttons a');
+    
+    subcategoryButtons.forEach(button => {
+        // 添加懸停效果
+        button.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('btn-primary')) {
+                this.classList.add('shadow-sm');
+            }
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.classList.remove('shadow-sm');
+        });
+        
+        // 點擊時添加載入效果
+        button.addEventListener('click', function() {
+            showLoadingOverlay(true);
+        });
+    });
+}
+
+/**
+ * 初始化排序功能
+ */
+function initializeSortFunction() {
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+        // 設定當前排序值
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSort = urlParams.get('sort') || 'default';
+        const currentOrder = urlParams.get('order') || 'DESC';
+        
+        // 設定選擇器的值
+        if (currentSort === 'default') {
+            sortSelect.value = 'default';
+        } else {
+            sortSelect.value = `${currentSort}-${currentOrder.toLowerCase()}`;
+        }
+        
+        sortSelect.addEventListener('change', function() {
+            const sortValue = this.value;
+            applySorting(sortValue);
+        });
+    }
+}
+
+/**
+ * 套用排序
+ * @param {string} sortValue - 排序值
+ */
+function applySorting(sortValue) {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // 解析排序值
+    if (sortValue === 'default') {
+        urlParams.delete('sort');
+        urlParams.delete('order');
+    } else {
+        const [sortBy, order] = sortValue.split('-');
+        urlParams.set('sort', sortBy);
+        urlParams.set('order', order.toUpperCase());
+    }
+    
+    // 重置到第一頁
+    urlParams.delete('page');
+    
+    // 重定向
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+    window.location.href = newUrl;
+}
+
+/**
+ * 初始化分頁連結
+ */
+function initializePagination() {
+    // 為分頁連結加入當前的篩選參數
+    const paginationLinks = document.querySelectorAll('.pagination a[href]');
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    paginationLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        const linkUrl = new URL(href, window.location.origin);
+        
+        // 保留當前的篩選參數
+        urlParams.forEach((value, key) => {
+            if (key !== 'page') {
+                linkUrl.searchParams.set(key, value);
+            }
+        });
+        
+        link.setAttribute('href', linkUrl.pathname + linkUrl.search);
+    });
+}
+
+/**
+ * 顯示/隱藏載入遮罩
+ * @param {boolean} show - 是否顯示
+ */
+function showLoadingOverlay(show) {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        if (show) {
+            overlay.classList.remove('d-none');
+        } else {
+            overlay.classList.add('d-none');
+        }
+    }
+}
 
 /**
  * 初始化購物車數量控制功能
@@ -101,7 +414,6 @@ function handleQuantityIncrease(productId) {
     if (currentQty < maxQty) {
         currentQty++;
         inputElement.value = currentQty;
-        console.log('currentQty:'+currentQty);
         updateCartItemQuantity(productId, currentQty);
     } else {
         showToast('已達到最大購買數量', 'warning');
@@ -147,9 +459,6 @@ function handleRemoveItem(productId) {
  * @param {number} quantity - 新的數量
  */
 function updateCartItemQuantity(productId, quantity) {
-    // 顯示載入提示
-    // showToast('正在更新數量...', 'info');
-    
     // 發送 AJAX 請求更新數量
     fetch('/cart/update', {
         method: 'PATCH',
@@ -360,49 +669,6 @@ function revertQuantityInput(productId) {
     console.log(`恢復商品 ${productId} 的數量`);
 }
 
-// 加入購物車表單提交
-const quickAddForm = document.getElementById('quickAddForm');
-if (quickAddForm) {
-    quickAddForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const productNumber = document.getElementById('productSelect').value;
-        const quantity = document.getElementById('productQty').value;
-
-        if (productNumber && quantity > 0) {
-            
-            // 呼叫 API 加入購物車
-            fetch('/cart', {
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                },
-                body: JSON.stringify({
-                    productNumber:productNumber,
-                    quantity:quantity
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success){
-                    showToast(`已將 ${productNumber} (${quantity} 件) 加入購物車`, 'success');
-                    // 重置數量
-                    document.getElementById('productQty').value = 1;
-                    
-                    // 更新購物車 UI
-                    updateCartUI(data.cartItemCount, data.cart, data.totalItemCount);
-                } else {
-                    showToast('加入購物車失敗', 'danger');
-                    console.log(data);
-                }
-            })
-            .catch(error => {
-                console.error('加入購物車時發生錯誤:', error);
-                showToast('加入購物車失敗', 'danger');
-            });
-        }
-    });
-}
-
 /**
  * 顯示 Toast 通知訊息
  * 在頁面上顯示臨時通知訊息
@@ -410,7 +676,17 @@ if (quickAddForm) {
  * @param {string} type - 訊息類型 ('success', 'warning', 'danger', 'info')
  */
 const showToast = (message, type = 'success') => {
-    const container = document.getElementById('toastContainer');
+    let container = document.getElementById('toastContainer');
+    
+    // 如果沒有 Toast container，動態創建一個
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1055';
+        document.body.appendChild(container);
+    }
+    
     const toast = document.createElement('div');
     const bgClass = type === 'success' ? 'text-bg-success' : 
                     type === 'warning' ? 'text-bg-warning' : 
@@ -436,28 +712,30 @@ const showToast = (message, type = 'success') => {
     }, 3000);
 }
 
+/**
+ * 綁定清空購物車按鈕
+ */
 function bindClearCartButton() {
-  const clearCartBtn = document.getElementById('clear-cart-btn');
-  if (clearCartBtn) {
-    clearCartBtn.addEventListener('click', async () => {
-      if (!confirm('確定要清空購物車嗎？')) return;
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    if (clearCartBtn) {
+        clearCartBtn.addEventListener('click', async () => {
+            if (!confirm('確定要清空購物車嗎？')) return;
 
-      try {
-        const res = await fetch('/cart/clear', { method: 'DELETE' });
-        if (res.ok) {
-          showToast('購物車已清空', 'success');
-          updateCartUI(0, [], 0); // UI reset
-        } else {
-          showToast('清空購物車失敗', 'danger');
-        }
-      } catch (err) {
-        console.error('清空購物車錯誤:', err);
-        showToast('發生錯誤，請稍後再試', 'danger');
-      }
-    });
-  }
+            try {
+                const res = await fetch('/cart/clear', { method: 'DELETE' });
+                if (res.ok) {
+                    showToast('購物車已清空', 'success');
+                    updateCartUI(0, [], 0); // UI reset
+                } else {
+                    showToast('清空購物車失敗', 'danger');
+                }
+            } catch (err) {
+                console.error('清空購物車錯誤:', err);
+                showToast('發生錯誤，請稍後再試', 'danger');
+            }
+        });
+    }
 }
-
 
 /**
  * 更新購物車 UI 顯示
@@ -467,114 +745,114 @@ function bindClearCartButton() {
  * @param {number} totalItemCount - 購物車商品總數量
  */
 const updateCartUI = (cartItemCount, cart, totalItemCount) => {
-  const cartBtn = document.querySelector('button[data-bs-target="#cartModal"]');
-  let cartBadge = cartBtn.querySelector('.badge');
-  const cartModalBody = document.querySelector('#cartModal .modal-body');
-  const cartModalFooter = document.querySelector('#cartModal .modal-footer');
+    const cartBtn = document.querySelector('button[data-bs-target="#cartModal"]');
+    let cartBadge = cartBtn.querySelector('.badge');
+    const cartModalBody = document.querySelector('#cartModal .modal-body');
+    const cartModalFooter = document.querySelector('#cartModal .modal-footer');
 
-  // 建立徽章
-  if (!cartBadge) {
-    cartBadge = document.createElement('span');
-    cartBadge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
-    cartBtn.appendChild(cartBadge);
-  }
+    // 建立徽章
+    if (!cartBadge) {
+        cartBadge = document.createElement('span');
+        cartBadge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+        cartBtn.appendChild(cartBadge);
+    }
 
-  // 更新徽章
-  if (cartItemCount > 0) {
-    cartBadge.textContent = cartItemCount;
-    cartBadge.classList.remove('d-none');
-  } else {
-    cartBadge.classList.add('d-none');
-  }
+    // 更新徽章
+    if (cartItemCount > 0) {
+        cartBadge.textContent = cartItemCount;
+        cartBadge.classList.remove('d-none');
+    } else {
+        cartBadge.classList.add('d-none');
+    }
 
-  if (Array.isArray(cart) && cart.length > 0) {
-    let total = 0;
+    if (Array.isArray(cart) && cart.length > 0) {
+        let total = 0;
 
-    const rows = cart.map(item => {
-      const subtotal = item.price * item.quantity;
-      total += subtotal;
+        const rows = cart.map(item => {
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
 
-      return `
-      <tr data-product-id="${item.productId}">
-        <td>
-          <div class="d-flex align-items-center">
-            ${item.image ? `<img src="${item.image}" class="me-2" style="width:40px;height:40px;object-fit:cover;">` : ''}
-            <span>${item.name}</span>
-          </div>
-        </td>
-        <td class="text-center">
-          <div class="input-group input-group-sm justify-content-center" style="max-width: 140px; margin: 0 auto;">
-            <button class="btn btn-outline-secondary btn-qty-decrease" type="button" data-product-id="${item.productId}">
-              <i class="bi bi-dash"></i>
-            </button>
-            <input type="number" class="form-control text-center qty-input"
-              value="${item.quantity}" min="1" max="99"
-              data-product-id="${item.productId}" style="max-width: 60px;" readonly>
-            <button class="btn btn-outline-secondary btn-qty-increase" type="button" data-product-id="${item.productId}">
-              <i class="bi bi-plus"></i>
-            </button>
-          </div>
-        </td>
-        <td class="text-end">NT$ ${item.price.toLocaleString()}</td>
-        <td class="text-end subtotal-cell">NT$ ${(subtotal).toLocaleString()}</td>
-        <td class="text-center">
-          <button class="btn btn-sm btn-outline-danger btn-remove-item" data-product-id="${item.productId}">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      </tr>`;
-    }).join('');
+            return `
+            <tr data-product-id="${item.productId}">
+                <td>
+                    <div class="d-flex align-items-center">
+                        ${item.image ? `<img src="${item.image}" class="me-2" style="width:40px;height:40px;object-fit:cover;">` : ''}
+                        <span>${item.name}</span>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <div class="input-group input-group-sm justify-content-center" style="max-width: 140px; margin: 0 auto;">
+                        <button class="btn btn-outline-secondary btn-qty-decrease" type="button" data-product-id="${item.productId}">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <input type="number" class="form-control text-center qty-input"
+                            value="${item.quantity}" min="1" max="99"
+                            data-product-id="${item.productId}" style="max-width: 60px;" readonly>
+                        <button class="btn btn-outline-secondary btn-qty-increase" type="button" data-product-id="${item.productId}">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </td>
+                <td class="text-end">NT$ ${item.price.toLocaleString()}</td>
+                <td class="text-end subtotal-cell">NT$ ${(subtotal).toLocaleString()}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-danger btn-remove-item" data-product-id="${item.productId}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
 
-    cartModalBody.innerHTML = `
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead class="table-light">
-            <tr>
-              <th>商品名稱</th>
-              <th class="text-center">數量</th>
-              <th class="text-end">單價</th>
-              <th class="text-end">小計</th>
-              <th class="text-center">操作</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-      <div class="border-top pt-3">
-        <div class="row">
-          <div class="col-md-6">
-            <p class="text-muted mb-1">共 <span id="total-items">${totalItemCount}</span> 件商品</p>
-          </div>
-          <div class="col-md-6 text-end">
-            <h5 class="fw-bold text-primary mb-0">總金額: NT$ <span id="total-price">${total.toLocaleString()}</span></h5>
-          </div>
-        </div>
-      </div>
-    `;
+        cartModalBody.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>商品名稱</th>
+                            <th class="text-center">數量</th>
+                            <th class="text-end">單價</th>
+                            <th class="text-end">小計</th>
+                            <th class="text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+            <div class="border-top pt-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="text-muted mb-1">共 <span id="total-items">${totalItemCount}</span> 件商品</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h5 class="fw-bold text-primary mb-0">總金額: NT$ <span id="total-price">${total.toLocaleString()}</span></h5>
+                    </div>
+                </div>
+            </div>
+        `;
 
-    cartModalFooter.innerHTML = `
-      <button id="clear-cart-btn" class="btn btn-outline-danger me-auto">清空購物車</button>
-      <div class="d-flex gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
-        <a href="/orders/step1" class="btn btn-primary">前往結帳</a>
-      </div>
-    `;
+        cartModalFooter.innerHTML = `
+            <button id="clear-cart-btn" class="btn btn-outline-danger me-auto">清空購物車</button>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
+                <a href="/orders/step1" class="btn btn-primary">前往結帳</a>
+            </div>
+        `;
 
-    // 綁定清空購物車按鈕
-    bindClearCartButton();
+        // 綁定清空購物車按鈕
+        bindClearCartButton();
 
-  } else {
-    // 空購物車處理
-    cartModalBody.innerHTML = `
-      <div class="text-center py-5">
-        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-        <h6 class="text-muted">您的購物車目前是空的</h6>
-        <p class="text-muted">快去選購您喜歡的商品吧！</p>
-      </div>
-    `;
+    } else {
+        // 空購物車處理
+        cartModalBody.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <h6 class="text-muted">您的購物車目前是空的</h6>
+                <p class="text-muted">快去選購您喜歡的商品吧！</p>
+            </div>
+        `;
 
-    cartModalFooter.innerHTML = `
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
-    `;
-  }
+        cartModalFooter.innerHTML = `
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
+        `;
+    }
 };
