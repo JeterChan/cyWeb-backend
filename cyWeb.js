@@ -8,9 +8,7 @@ const passportConfig = require('./config/passport');
 const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
-const csurf = require('csurf');
-const fs = require('fs');
-const path = require('path');
+
 
 // swagger
 const swaggerUi = require('swagger-ui-express');
