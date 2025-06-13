@@ -1,10 +1,11 @@
-const { Product, Subcategory, Category, Cart } = require('../db/models')
+const { Product, Subcategory, Category, Cart} = require('../db/models')
 const { Op } = require("sequelize");
 
 // get all products
 // 顯示商品列表
 const getProducts = async(req, res) => {
     try {
+        
         // 從查詢參數取得類別的slug
         const categorySlug = req.query.category;
         const subcategorySlug = req.query.subcategory;

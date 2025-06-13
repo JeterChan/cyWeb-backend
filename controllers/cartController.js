@@ -9,6 +9,8 @@ const addProductToCart = async (req, res) => {
         if(!req.session.cart) {
             req.session.cart = [];
         }
+
+        console.log('req.session.cart:', req.session.cart);
         const { productNumber, quantity } = req.body;
         // 檢查商品是否存在
         const product = await Product.findOne({ where: { productNumber: productNumber } });
@@ -29,6 +31,7 @@ const addProductToCart = async (req, res) => {
                 name:product.name,
                 price: parseInt(product.basePrice),
                 quantity:parseInt(quantity),
+                subtotal:parseInt(product.basePrice) * parseInt(quantity)
             })
         }
         console.log(req.session.cart);
