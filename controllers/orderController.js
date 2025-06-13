@@ -149,7 +149,7 @@ const getCheckoutSuccess = async(req,res)=>{
         const dynamicData = {
             "orderId": newOrder.orderNumber || "",
             "company": orderInfo.customerInfo.company || "",
-            "orderDate": newOrder.createdAt || "",
+            "orderDate": (newOrder.createdAt).toLocaleString('zh-TW') || "",
             "shippingAddress": orderInfo.delivery.customerAddress || "",
             "paymentMethod": getPaymentMethodLabel(paymentMethod) || "",
             "notes": newOrder.notes || "",
