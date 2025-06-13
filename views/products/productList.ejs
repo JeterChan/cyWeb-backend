@@ -11,7 +11,7 @@
                 </li>
                 <% if (typeof currentCategory !== 'undefined' && currentCategory) { %>
                     <li class="breadcrumb-item active" aria-current="page">
-                        <%= currentCategory %>
+                        <%= getCategoryLabel(currentCategory) %>
                     </li>
                 <% } else { %>
                     <li class="breadcrumb-item active" aria-current="page">
