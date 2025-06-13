@@ -24,24 +24,14 @@ const userRouter = require('./routes/userRouter');
 const cartRouter = require('./routes/cartRouter');
 const orderRouter = require('./routes/orderRouter.js');
 
-// test
-const testRouter = require('./routes/testRouter.js');
-
 const app = express();
 
 // middleware
 const setLocals = require('./middleware/locals');
 
-// use morgan for logging
-// switch(process.env.NODE_ENV) {
-//   case 'development':
-//     app.use(morgan('dev'))
-//     break
-//   case 'production':
-//     const stream = fs.createWriteStream(path.join(__dirname + 'access.log'),{flags:'a'});
-//     app.use(morgan('combined', {stream}));
-//     break  
-// }
+if(process.env.NODE_ENV === 'production'){
+  app.set('trust proxy', 1);
+}
 
 // session config
 app.use(session)
@@ -81,12 +71,12 @@ app.use('/api/v1', apiRouter);
 app.use('/cart', cartRouter);
 // order route
 app.use('/orders', orderRouter);
-//test
-app.use('/test', testRouter);
+
 // 404 page
 app.use((req, res, next) => {
   res.status(404).render('404');
 });
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server listening on "http://localhost:${process.env.PORT}"`);
