@@ -1,21 +1,21 @@
 <body class="bg-light">
   <div class="container py-4">
-    <a href="/" class="text-decoration-none mb-3 d-inline-block">← Back to Shop</a>
-    <h2 class="fw-bold mb-4">Complete Your Order</h2>
+    <a href="/" class="text-decoration-none mb-3 d-inline-block">← 回到商店</a>
+    <h2 class="fw-bold mb-4">訂單結帳流程</h2>
 
     <!-- 步驟指引 -->
     <div class="d-flex justify-content-between align-items-center mb-4 step-indicator bg-light p-3 rounded">
       <div class="text-center flex-fill active-step py-2">
         <i class="bi bi-person-circle fs-4 d-block"></i>
-        Personal Info
+        訂購人資訊
       </div>
       <div class="text-center flex-fill text-muted py-2">
         <i class="bi bi-geo-alt fs-4 d-block"></i>
-        Shipping
+        運送資訊
       </div>
       <div class="text-center flex-fill text-muted py-2">
         <i class="bi bi-credit-card fs-4 d-block"></i>
-        Bank Info
+        付款方式
       </div>
     </div>
 
@@ -24,7 +24,7 @@
         <!-- 左側表單 -->
         <div class="col-lg-8">
           <div class="card p-4">
-            <h5 class="mb-3 fw-bold">Personal Information</h5>
+            <h5 class="mb-3 fw-bold">訂購人資訊</h5>
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="company" class="form-label">訂購單位</label>
@@ -56,14 +56,14 @@
                   <input type="text" class="form-control" id="taxId" name="taxId">
                 </div>
               </div>
-            <button type="submit" class="btn btn-gradient w-100 mt-3">Continue to Shipping</button>
+            <button type="submit" class="btn btn-gradient w-100 mt-3">下一步</button>
           </div>
         </div>
 
         <!-- 右側訂單摘要 -->
         <div class="col-lg-4">
           <div class="card p-4">
-            <h5 class="fw-bold mb-3">Order Summary</h5>
+            <h5 class="fw-bold mb-3">訂單總覽</h5>
             <% cartItems.forEach(item => { %>
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="d-flex align-items-center">
@@ -78,7 +78,7 @@
             <% }) %>
             <hr>
             <div class="d-flex justify-content-between fw-bold fs-5 mt-2">
-              <span>Total: ( <%= cartItems.length %> 項商品):</span>
+              <span>總價: ( <%= cartItems.length %> 項商品):</span>
               <span>$<%= totalAmount.toLocaleString() %></span>
             </div>
           </div>

@@ -15,14 +15,20 @@
         <p class="fs-4">$<%= totalAmount.toLocaleString() %></p>
       </div>
 
-      <% if (paymentMethod === 'bank_transfer' || paymentMethod === 'remittance') { %>
+      <% if (paymentMethod === 'bank_transfer') { %>
         <div class="alert alert-warning mt-4 text-start">
           <strong>請注意：</strong>我們會在確認收到您的付款後安排出貨。<br><br>
           <strong>轉帳資訊如下：</strong><br>
-          銀行名稱：第一商業銀行 中壢分行<br>
-          銀行代碼：007<br>
-          戶名：駿英企業社<br>
-          銀行帳號：123456789012<br>
+          <p>銀行名稱：台北富邦商業銀行<br>分行：中壢分行<br>帳號：12345678901234<br>戶名：駿英企業社</p>
+          <br>
+          完成轉帳後，請來信告知您的 <strong>帳號末五碼</strong> 及 <strong>訂單編號</strong>，以利我們對帳確認。
+        </div>
+      <% } else if (paymentMethod === 'remittance') { %>
+        <div class="alert alert-warning mt-4 text-start">
+          <strong>請注意：</strong>我們會在確認收到您的匯款後安排出貨。<br><br>
+          <strong>郵局代碼：700</strong><br>
+          <strong>帳號：00412345678901</strong><br>
+          <strong>戶名：駿英企業社</strong><br>
           <br>
           完成匯款後，請來信告知您的 <strong>帳號末五碼</strong> 及 <strong>訂單編號</strong>，以利我們對帳確認。
         </div>

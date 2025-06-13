@@ -13,7 +13,7 @@
 
   <!-- 搜尋 + 篩選 -->
   <form class="input-group mb-4" method="GET" action="/admin/orders">
-    <input type="text" name="search" class="form-control" placeholder="Search by order ID ,customer or company ..." value="<%= search %>">
+    <input type="text" name="search" class="form-control" placeholder="請搜尋訂單編號、公司名稱、訂購人姓名..." value="<%= search %>">
     <select name="status" class="form-select w-auto">
       <option value="">所有訂單</option>
       <option value="processing" <%= status === 'processing' ? 'selected' : '' %>>處理中</option>

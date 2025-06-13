@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: production
     ports:
       - "8080:8080"
     env_file:
@@ -12,14 +13,14 @@ services:
       - MYSQL_HOST=mysql
       # Redis configuration
       - REDIS_HOST=redis
-      - NODE_ENV=production
+      - NODE_ENV=development
+    command: npm run dev # 使用 npm run dev 啟動開發模式
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
-      - ./:/app  # 開發時即時重載：掛載整個專案目錄
       - ./public:/app/public
       - /app/node_modules
     networks:
