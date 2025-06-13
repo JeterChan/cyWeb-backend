@@ -31,6 +31,7 @@ const addProductToCart = async (req, res) => {
                 name:product.name,
                 price: parseInt(product.basePrice),
                 quantity:parseInt(quantity),
+                subtotal:parseInt(product.basePrice) * parseInt(quantity)
             })
         }
         console.log(req.session.cart);
