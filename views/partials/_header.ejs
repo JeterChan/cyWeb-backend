@@ -1,5 +1,5 @@
 <% if (!isCheckout) { %>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
   <div class="container">
     <a class="navbar-brand fw-bold" href="/products">駿英企業社</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -24,14 +24,7 @@
         </li>
       </ul>
 
-      <!-- <form class="d-flex me-2" action="/products/search" method="GET">
-        <input class="form-control me-2" type="search" placeholder="搜尋商品" name="q" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">搜尋</button>
-      </form> -->
-
-      <%- include('cart') %>
-
-       <div class="d-flex">
+      <div class="d-flex">
         <% if (isAuthenticated) { %>
           <% if (user && user.role === 'admin') { %>
             <a href="/admin/orders" class="btn btn-warning me-2">訂單管理</a>
@@ -42,7 +35,7 @@
             <button type="submit" class="btn btn-outline-primary">登出</button>
           </form>
         <% } else { %>
-          <a href="/users/login" class="btn btn-outline-primary me-2">登入</a>
+          <a href="/users/login" class="btn btn-secondary me-2">登入</a>
           <a href="/users/register" class="btn btn-primary">註冊</a>
         <% } %>
       </div>
@@ -51,7 +44,7 @@
 </nav>
 <% } else { %>
 <!-- ✅ Checkout 精簡版 Header -->
-<nav class="navbar navbar-light bg-white border-bottom shadow-sm">
+<nav class="navbar navbar-light bg-white border-bottom shadow-sm sticky-top">
   <div class="container d-flex justify-content-between align-items-center">
     <a class="navbar-brand fw-bold" href="/">駿英企業社</a>
     <div class="d-flex align-items-center gap-3">
@@ -65,5 +58,4 @@
     </div>
   </div>
 </nav>
-
 <% } %>

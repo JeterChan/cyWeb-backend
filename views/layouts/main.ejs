@@ -14,7 +14,11 @@
         <link href="/css/register-success.css" rel="stylesheet">
         <link href="/css/products.css" rel="stylesheet">
         <link href="/css/product-detail.css" rel="stylesheet">
-
+        <!-- <link rel="stylesheet" href="/css/theme.css"> -->
+        <!-- 引入購物車 Modal 的 RWD 樣式 -->
+        <link rel="stylesheet" href="/css/cart.css">
+        <!-- 引入新的浮動按鈕樣式 -->
+        <link rel="stylesheet" href="/css/floating-cart.css">
     </head>
     <body>
         <% if (currentPath === '/users/login' || currentPath === '/users/register') { %>
@@ -31,12 +35,14 @@
         <main class="container py-4">
             <%- include('../partials/message') %>
             <%- body %>
+            <%# 引入浮動購物車 (按鈕 + Modal) %>
+            <%- include('../cart/_floating-cart') %>
         </main>
 
         <%- include('../partials/_footer') %>
 
         <!-- Toast Container -->
-        <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;"></div>
+        <div id="toastContainer" class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1055;"></div>
 
         <!-- Bootstrap 5 JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
