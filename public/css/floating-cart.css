@@ -1,0 +1,31 @@
+/*
+  別忘了也要引入 cart.css 來處理 Modal 內部的 RWD 樣式
+  <link rel="stylesheet" href="/css/cart.css">
+*/
+
+.floating-cart-container {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1030; /* 確保在 header 之上，但在 modal 之下 */
+}
+
+.floating-cart-container .btn {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.floating-cart-container .btn:hover {
+  transform: scale(1.1);
+}
+
+/* 調整小紅點徽章的位置 */
+.floating-cart-container .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.6em;
+}

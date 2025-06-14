@@ -1,0 +1,63 @@
+/* --- Creamy White Theme Color Palette & Global Styles --- */
+:root {
+  --primary-bg: #fdfaf6;      /* 主要背景 (米杏色) */
+  --secondary-bg: #ffffff;    /* 次要背景 (純白，用於卡片) */
+  --border-color: #e8e6e3;    /* 邊框顏色 (柔和的米色) */
+  --text-primary: #3d3d3d;      /* 主要文字 (深炭灰) */
+  --text-secondary: #7a7a7a;   /* 次要文字 (中灰色) */
+  --accent-color: #a0937d;      /* 強調色 (柔和的褐色) */
+  --accent-hover: #8c7f6b;      /* 強調色 (滑鼠懸停) */
+  --danger-color: #dc3545;       /* 危險/刪除色 */
+}
+
+body {
+  background-color: var(--primary-bg);
+  color: var(--text-primary);
+  /* padding-top:  根據您 header 的實際高度來調整 */
+}
+
+/* --- Override Bootstrap Component Colors --- */
+
+/* 按鈕 */
+.btn-primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: white;
+}
+
+.btn-outline-danger {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+.btn-outline-danger:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #d6d2c4;
+    border-color: #d6d2c4;
+    color: var(--text-primary);
+}
+.btn-secondary:hover {
+    background-color: #c5bfb0;
+    border-color: #c5bfb0;
+}
+
+/* 表單 */
+.form-control {
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+.form-control:focus {
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem rgba(160, 147, 125, 0.25);
+}
