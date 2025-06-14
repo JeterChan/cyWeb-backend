@@ -21,6 +21,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
+      - ./:/app # 開發時同步程式碼
       - ./public:/app/public
       - /app/node_modules
     networks:
