@@ -52,7 +52,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     token_expires_at: {
       type:DataTypes.DATE(),
-    }
+    },
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
   }, {
     sequelize,
     modelName: 'User',
