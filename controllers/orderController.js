@@ -84,10 +84,10 @@ const getCheckoutSuccess = async(req,res)=>{
         // test order number
         const orderNumber = 'ORD-' + Date.now();
         const paymentNumber = 'PAY-' + Date.now();
-        const subtotal = cart.reduce((sum, item)=> sum + item.price, 0);
-        const shippingFee = 60;
+        const subtotal = cart.reduce((sum, item)=> sum + item.subtotal, 0);
+        // const shippingFee = 60;
         const discountAmount = 1; // 暫時寫死，未來可根據邏輯調整
-        const totalAmount = (subtotal+shippingFee) * discountAmount;
+        const totalAmount = (subtotal) * discountAmount;
         // 1. 儲存進 databse
         // 建立 order
         console.log(req.session.orderInformation);
@@ -98,7 +98,7 @@ const getCheckoutSuccess = async(req,res)=>{
             shippingFee:60,// 會改
             discountAmount:1, // ratio
             taxAmount:0, // 會改
-            totalAmount:(subtotal+shippingFee) * discountAmount,
+            totalAmount:totalAmount,
             company:orderInfo.customerInfo.company || null,
             customerName:orderInfo.customerInfo.contactPerson,
             customerEmail:orderInfo.customerInfo.email,
