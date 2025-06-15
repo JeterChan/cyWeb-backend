@@ -1,0 +1,18 @@
+/*
+  這個檔案用來修正全域的版面問題，例如 sticky footer。
+  請在您的主要版面檔案 (layout.ejs) 中引入它。
+*/
+
+html {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%; /* 讓 body 的高度至少填滿整個視窗 */
+}
+
+.main-content {
+  flex-grow: 1; /* 這是關鍵：讓主要內容區域自動伸展，填滿所有剩餘的空間 */
+}
