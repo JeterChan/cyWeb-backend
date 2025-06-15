@@ -85,7 +85,7 @@ const getCheckoutSuccess = async(req,res)=>{
         const orderNumber = 'ORD-' + Date.now();
         const paymentNumber = 'PAY-' + Date.now();
         const subtotal = cart.reduce((sum, item)=> sum + item.subtotal, 0);
-        // const shippingFee = 60;
+        const shippingFee = 0;
         const discountAmount = 1; // 暫時寫死，未來可根據邏輯調整
         const totalAmount = (subtotal) * discountAmount;
         // 1. 儲存進 databse
@@ -95,7 +95,7 @@ const getCheckoutSuccess = async(req,res)=>{
             userId:req.user?.id || null,
             orderNumber:orderNumber,
             subtotal:subtotal,
-            shippingFee:60,// 會改
+            shippingFee:0,// 會改
             discountAmount:1, // ratio
             taxAmount:0, // 會改
             totalAmount:totalAmount,
