@@ -19,5 +19,13 @@ router.get('/verify-expired', ensureGuest, async(req, res) =>{ res.render('users
 router.post('/resend-verification', ensureGuest, userController.resendVerificationToken);
 // 處理登出請求
 router.post('/logout', ensureAuthenticated, userController.logout);
+// 忘記密碼
+router.get('/forgot-password', ensureGuest, userController.getForgotPasswordPage);
+// 處理忘記密碼請求
+router.post('/forgot-password', ensureGuest, userController.forgotPassword);
+// 驗證重設密碼的token
+router.get('/reset-password/:token', ensureGuest, userController.getResetPasswordPage);
+// 處理重設密碼請求
+router.post('/reset-password/:token', ensureGuest, userController.resetPassword);
 
 module.exports = router;
