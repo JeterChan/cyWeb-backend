@@ -7,7 +7,9 @@
     "start": "node cyWeb.js",
     "build": "npm install",
     "dev": "nodemon cyWeb.js",
-    "docker:dev": "nodemon cyWeb.js"
+    "docker:dev": "nodemon cyWeb.js",
+    "migrate": "npx sequelize-cli db:migrate",
+    "start:prod": "npm run migrate && npm start"
   },
   "keywords": [],
   "author": "",
