@@ -4,17 +4,17 @@ const {validationResult} = require('express-validator');
 const passport = require('passport');
 const { v4:uuidv4 } = require('uuid');
 const crypto = require('crypto');
-const { sendVerificationEmail } = require('../utils/mailer');
+const { sendVerificationEmail, sendResetPasswordEmail } = require('../utils/mailer');
 const { token } = require('morgan');
 
 // get login page
 const getLoginPage = async (req, res) => {
-    res.render('login')
+    res.render('users/login')
 }
 
 //get register page
 const getRegisterPage = async (req, res) => {
-    res.render('register', {oldInput:null})
+    res.render('users/register', {oldInput:null})
 }
 
 // 註冊邏輯
@@ -336,6 +336,102 @@ const loginUser = async(req, res, next) => {
         }
     })(req, res, next); // 給 passport.authticate() 回傳函式需要用的參數
 };
+// 忘記密碼頁面
+const getForgotPasswordPage = async (req, res) => {
+    res.render('users/forgot-password')
+}
+// 忘記密碼邏輯
+const forgotPassword = async (req, res) => {
+    try {
+        // 1. 檢查 email 是否存在
+        const { email } = req.body;
+        const user = await User.findOne({ where: { email}});
+        if(!user){
+            // 沒有找到 user, 顯示錯誤訊息
+            req.flash('error_msg', '找不到該電子郵件的用戶');
+            return res.redirect('/users/forgot-password');
+        }
+        // email 存在, 產生 random token
+        const token = crypto.randomBytes(32).toString('hex');
+        // 設定 token_expires_at
+        const now = new Date();
+        const token_expires_at = new Date(now.getTime() + 1*60*60*1000); // 1 小時後過期
+        // 更新 user 的 token 和過期時間
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = token_expires_at;
+        await user.save();
+        // 寄送重設密碼的 email
+        await sendResetPasswordEmail(email, token);
+        req.flash('success_msg', '重設密碼的連結已寄送到您的電子郵件，請檢查您的信箱');
+        res.redirect('/users/forgot-password');
+    } catch (error) {
+        console.error('忘記密碼錯誤:', error);
+        req.flash('error_msg', '無法處理忘記密碼請求，請稍後再試');
+        throw error;
+    }
+}
+
+const getResetPasswordPage = async (req, res) => {
+    try {
+        // 1. 驗證 token 是否存在
+        const { token } = req.params;
+        const user = await User.findOne({ where: { resetPasswordToken:token }});
+        if(!user){
+            // 沒有找到 user, 顯示錯誤訊息
+            req.flash('error_msg', '無效的重設密碼連結');
+            return res.redirect('/users/forgot-password');
+        }
+        
+        // 2. 驗證 token 是否過期
+        const now = new Date();
+        if(user.resetPasswordExpires < now) {
+            // token 過期
+            req.flash('error_msg', '重設密碼連結已過期，請重新申請');
+            return res.redirect('/users/forgot-password');
+        }
+        // 3. token 有效，顯示重設密碼頁面
+        res.render('users/reset-password', { token });
+    } catch (error) {
+        console.error('重設密碼頁面錯誤:', error);
+        req.flash('error_msg', '無法顯示重設密碼頁面，請稍後再試');
+        res.redirect('/users/forgot-password');
+    }
+}
+
+const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { password, confirmPassword } = req.body;
+
+        // 檢查密碼是否一致
+        if(password !== confirmPassword) {
+            req.flash('error_msg', '密碼不一致，請重新輸入');
+            return res.redirect(`/users/reset-password/${token}`);
+        }
+
+        // 1. 驗證 token 是否存在
+        const user = await User.findOne({ where: { resetPasswordToken: token}});
+        if(!user) {
+            // 沒找到 user, 顯示錯誤訊息
+            req.flash('error_msg', '無效的重設密碼連結');
+            return res.redirect('/uers/forgot-password');
+        }
+        // 2. 產生加密的密碼
+        const hashedPassword = await bcrypt.hash(password,10);
+        // 3. 更新 user 的密碼和清除 token
+        user.password = hashedPassword;
+        user.resetPasswordToken = null;
+        user.resetPasswordExpires = null;
+        await user.save();
+        // 4. 顯示成功訊息並導向登入頁面
+        req.flash('success_msg', '密碼已成功重設，請登入');
+        res.redirect('/users/login');
+    } catch (error) {
+        console.error('重設密碼錯誤:', error);
+        req.flash('error_msg', '無法重設密碼，請稍後再試');
+        res.redirect(`/users/reset-password/${token}`);
+    }
+}
 
 module.exports = {
     register,
@@ -345,4 +441,8 @@ module.exports = {
     loginUser,
     verifyToken,
     resendVerificationToken,
+    getForgotPasswordPage,
+    forgotPassword,
+    getResetPasswordPage,
+    resetPassword
 }

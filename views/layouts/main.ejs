@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="/css/cart.css">
         <!-- 引入新的浮動按鈕樣式 -->
         <link rel="stylesheet" href="/css/floating-cart.css">
+        <link rel="stylesheet" href="/css/layout-fixes.css">
     </head>
     <body>
         <% if (currentPath === '/users/login' || currentPath === '/users/register') { %>
@@ -32,7 +33,7 @@
         }) %>
         <% } %>
 
-        <main class="container py-4">
+        <main class="container py-4 main-content">
             <%- include('../partials/message') %>
             <%- body %>
             <%# 引入浮動購物車 (按鈕 + Modal) %>

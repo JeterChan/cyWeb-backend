@@ -43,7 +43,30 @@ const sendVerificationEmail = async (to,verification_token) => {
         throw error;
     }
 }
+
+const sendResetPasswordEmail = async (to, resetPasswordToken) => {
+    try {
+        // 組成一個重設密碼的 URL
+        const resetPasswordUrl = `${process.env.BASE_URL}/users/reset-password/${resetPasswordToken}`;
+        await sendgrid.send({
+            to,
+            from:{
+                email:process.env.NO_REPLAY_EMAIL,
+                name:'駿英企業社'
+            },
+            templateId:process.env.RESET_PASSWORD_TEMPLATE_ID,
+            subject:'會員密碼重設驗證信',
+            dynamic_template_data:{
+                resetPasswordUrl
+            }
+        })
+    } catch (error) {
+        console.error('Failed to send reset password mail:', error.response.body.errors);
+        throw error;
+    }
+}
 module.exports = {
     sendOrderEmail,
-    sendVerificationEmail
+    sendVerificationEmail,
+    sendResetPasswordEmail
 }
