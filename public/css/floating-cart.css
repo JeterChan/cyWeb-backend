@@ -7,8 +7,9 @@
 }
 
 .floating-cart-container .btn {
-  background-color: var(--accent-color);
-  border-color: var(--accent-color);
+  /* 將預設顏色改為主題中較深的褐色 */
+  background-color: var(--accent-hover, #342e26);
+  border-color: var(--accent-hover, #716654);
   width: 60px;
   height: 60px;
   display: flex;
@@ -18,11 +19,11 @@
   transition: all 0.2s ease-in-out;
 }
 
-/* 修正：明確指定 hover 狀態的背景和邊框顏色 */
 .floating-cart-container .btn:hover {
   transform: scale(1.1);
-  background-color: var(--accent-hover);
-  border-color: var(--accent-hover);
+  /* 設定一個更深的顏色作為滑鼠懸停效果 */
+  background-color: #5a5244;
+  border-color: #5a5244;
 }
 
 /* 調整小紅點徽章的位置 */
@@ -39,3 +40,4 @@
   border: 1px solid var(--border-color, #e8e6e3);
   border-radius: 0.75rem;
 }
+/* ... (以下 modal 樣式省略) ... */
