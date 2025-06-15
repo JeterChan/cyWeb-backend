@@ -1,9 +1,18 @@
-<nav class="mt-3" aria-label="Page navigation">
+<!--
+  請在您的主要版面檔案中引入 pagination.css
+  <link rel="stylesheet" href="/css/pagination.css">
+-->
+
+<% if (totalPages > 1) { %>
+<nav class="mt-4" aria-label="Page navigation">
     <ul class="pagination justify-content-center">
-        <!-- 使用普通的 href 鏈接而不是 data-page -->
+        <!-- 上一頁按鈕 -->
         <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-            <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                <span aria-hidden="true">上一頁</span>
+            <a class="page-link" href="?page=<%= currentPage - 1 %>&category=<%= selectedCategory %>" aria-label="Previous">
+                <!-- 在小螢幕上顯示圖示 -->
+                <span aria-hidden="true" class="d-inline d-sm-none">&laquo;</span>
+                <!-- 在大於 sm 的螢幕上顯示文字 -->
+                <span aria-hidden="true" class="d-none d-sm-inline">上一頁</span>
             </a>
         </li>
 
@@ -43,10 +52,15 @@
             </li>
         <% } %>
 
+        <!-- 下一頁按鈕 -->
         <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-            <a class="page-link" href="?category=<%= selectedCategory %>&page=<%= currentPage + 1 %>" aria-label="Next">
-                <span aria-hidden="true">下一頁</span>
+            <a class="page-link" href="?category=<%= selectedCategory %>&page=<%= parseInt(currentPage) + 1 %>" aria-label="Next">
+                <!-- 在小螢幕上顯示圖示 -->
+                <span aria-hidden="true" class="d-inline d-sm-none">&raquo;</span>
+                <!-- 在大於 sm 的螢幕上顯示文字 -->
+                <span aria-hidden="true" class="d-none d-sm-inline">下一頁</span>
             </a>
         </li>
     </ul>
 </nav>
+<% } %>

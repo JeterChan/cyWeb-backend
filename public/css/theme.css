@@ -5,8 +5,11 @@
   --border-color: #e8e6e3;    /* 邊框顏色 (柔和的米色) */
   --text-primary: #3d3d3d;      /* 主要文字 (深炭灰) */
   --text-secondary: #7a7a7a;   /* 次要文字 (中灰色) */
-  --accent-color: #a0937d;      /* 強調色 (柔和的褐色) */
-  --accent-hover: #8c7f6b;      /* 強調色 (滑鼠懸停) */
+  
+  /* --- 顏色已更新 --- */
+  --accent-color: #8c7f6b;      /* 強調色 (更新為較深的褐色) */
+  --accent-hover: #716654;      /* 強調色 (滑鼠懸停時更深的褐色) */
+
   --danger-color: #dc3545;       /* 危險/刪除色 */
 }
 
@@ -22,7 +25,7 @@ body {
 .btn-primary {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
-  color: var(--text-primary);
+  color: white; /* 將文字顏色改為白色 */
 }
 .btn-primary:hover {
   background-color: var(--accent-hover);
@@ -59,5 +62,6 @@ body {
     background-color: var(--secondary-bg);
     color: var(--text-primary);
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 0.25rem rgba(160, 147, 125, 0.25);
+    /* 陰影顏色也需要跟著更新 */
+    box-shadow: 0 0 0 0.25rem rgba(140, 127, 107, 0.25);
 }
