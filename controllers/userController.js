@@ -25,7 +25,7 @@ const register = async (req, res) => {
         if(!errors.isEmpty()) {
             res.locals.errors = errors.array();
             console.log(errors.array());
-            return res.render('register',{
+            return res.render('users/register',{
                 oldInput: {
                     email: req.body.email,
                 }
@@ -46,10 +46,10 @@ const register = async (req, res) => {
             // 如果 email 已存在但未驗證，重新寄送驗證信
             // 顯示 req.flash
             req.flash('info_msg', '您的帳號尚未驗證，請檢查您的電子郵件以重新寄送驗證信');
-            return res.redirect('users/verify-expired');
+            return res.redirect('/users/verify-expired');
         }
         if (existingUser) {
-            return res.render('register' , {
+            return res.render('users/register' , {
                 errors: [{
                     msg: '此電子郵件已被註冊'
                 }],
@@ -88,7 +88,7 @@ const register = async (req, res) => {
         });
     } catch(error) {
         console.log('註冊錯誤', error);
-        res.render('register', {
+        res.render('users/register', {
             errors:[{
                 msg:'註冊過程中發生錯誤, 請稍後再試'
             }],
