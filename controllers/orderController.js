@@ -140,7 +140,7 @@ const postCheckoutConfirmation = async(req, res) => {
         const orderInfo = req.session.orderInformation;
         console.log(cart);
         const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity ,0);
-        const shippingFee = 60; // 暫時寫死，未來可根據邏輯調整
+        const shippingFee = 0; // 暫時寫死，未來可根據邏輯調整
         const total = subtotal + shippingFee; // 暫時寫死，未來可根據邏輯調整
         // 1. customerInfo
         // 2. delivery
