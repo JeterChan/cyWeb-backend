@@ -173,18 +173,6 @@
                                 </p>
                             <% } %>
                             
-                            <div class="mb-2">
-                                <% if (product.quantity > 0) { %>
-                                    <small class="text-success">
-                                        <i class="bi bi-check-circle-fill"></i> 現貨供應
-                                    </small>
-                                <% } else { %>
-                                    <small class="text-danger">
-                                        <i class="bi bi-x-circle-fill"></i> 暫時缺貨
-                                    </small>
-                                <% } %>
-                            </div>
-                            
                             <div class="mt-auto">
                                 <div class="d-grid mb-2">
                                     <a href="/products/<%= product.productNumber %>" 
