@@ -112,7 +112,7 @@ function addToCartFromCard(productNumber, productName, quantity, button) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showToast(`已將 ${productName} (${quantity} 件) 加入購物車`, 'success');
+            // showToast(`已將 ${productName} (${quantity} 件) 加入購物車`, 'success');
             
             // 更新購物車 UI
             updateCartUI(data.cartItemCount, data.cart, data.totalItemCount);
@@ -161,7 +161,7 @@ function setButtonSuccess(button) {
         button.classList.remove('btn-outline-success');
         button.classList.add('btn-success');
         button.disabled = false;
-    }, 2000);
+    }, 500);
 }
 
 /**
@@ -229,10 +229,10 @@ function validateProductQtyInput(productNumber) {
     // 確保數值在有效範圍內
     if (value < min) {
         value = min;
-        showToast(`數量不能少於 ${min}`, 'warning');
+        // showToast(`數量不能少於 ${min}`, 'warning');
     } else if (value > max) {
         value = max;
-        showToast(`數量不能超過 ${max}`, 'warning');
+        // showToast(`數量不能超過 ${max}`, 'warning');
     }
     
     input.value = value;
@@ -483,7 +483,7 @@ function updateCartItemQuantity(productId, quantity) {
             // 更新購物車徽章
             updateCartBadge(data.cartItemCount);
             
-            showToast('數量已更新', 'success');
+            // showToast('數量已更新', 'success');
         } else {
             showToast(data.message || '更新失敗', 'danger');
             // 恢復原始數量
@@ -531,7 +531,7 @@ function removeCartItem(productId) {
             // 檢查購物車是否為空
             checkEmptyCart();
             
-            showToast('商品已移除', 'success');
+            // showToast('商品已移除', 'success');
         } else {
             showToast(data.message || '移除失敗', 'danger');
         }
@@ -746,23 +746,28 @@ function bindClearCartButton() {
  * @param {number} totalItemCount - 購物車商品總數量
  */
 const updateCartUI = (cartItemCount, cart, totalItemCount) => {
+    const cartBtn = document.querySelector('button[data-bs-target="#cartModal"]');
+    let cartBadge = cartBtn.querySelector('.badge');
     const cartModalBody = document.querySelector('#cartModal .modal-body');
     const cartModalFooter = document.querySelector('#cartModal .modal-footer');
-    const cartBadge = document.querySelector('.floating-cart-container .badge');
 
     // 如果 modal 不存在，也直接返回
     if (!cartModalBody || !cartModalFooter) return;
 
     // 更新徽章
-    if (cartBadge) {
-        if (cartItemCount > 0) {
-            cartBadge.textContent = cartItemCount > 99 ? '99+' : cartItemCount;
-            cartBadge.style.display = 'flex';
-        } else {
-            cartBadge.style.display = 'none';
-        }
+    // 建立徽章Add commentMore actions
+    if (!cartBadge) {
+        cartBadge = document.createElement('span');
+        cartBadge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+        cartBtn.appendChild(cartBadge);
     }
 
+    if (cartItemCount > 0) {
+        cartBadge.textContent = cartItemCount;
+        cartBadge.classList.remove('d-none');
+    } else {
+        cartBadge.classList.add('d-none');
+    }
 
     if (Array.isArray(cart) && cart.length > 0) {
         let totalPrice = 0;
