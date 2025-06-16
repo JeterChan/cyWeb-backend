@@ -835,7 +835,7 @@ const updateCartUI = (cartItemCount, cart, totalItemCount) => {
             <button id="clear-cart-btn" class="btn btn-outline-danger me-auto">清空購物車</button>
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
-                <a href="/orders/step1" class="btn btn-primary">前往結帳</a>
+                <a href="/orders/personal-info" class="btn btn-primary">前往結帳</a>
             </div>
         `;
 
