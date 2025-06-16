@@ -45,8 +45,8 @@ const register = async (req, res) => {
         } else if(existingUser && !existingUser.isVerified) {
             // 如果 email 已存在但未驗證，重新寄送驗證信
             // 顯示 req.flash
-            req.flash('info_msg', '您的帳號尚未驗證，請檢查您的電子郵件以重新寄送驗證信');
-            return res.redirect('/users/verify-expired');
+            req.flash('warning_msg', '您的帳號尚未驗證，請檢查您的電子郵件以重新寄送驗證信');
+            return res.redirect('/users/register');
         }
         if (existingUser) {
             return res.render('users/register' , {
@@ -105,14 +105,18 @@ const verifyToken = async(req, res) => {
         const { token } = req.params;
         // 1. 用該 token 去資料庫找user data
         const user = await User.findOne({ where:{ verification_token:token}});
-        if(!user) {
+        
+        if(user === null) {
             // 沒找到 user
-            res.status(404).render('404');
+            console.log('驗證 token 錯誤, 沒有找到 user');
+            return res.redirect('/users/verify-expired');
         }
+        
         // 2. verify token 時間
         const now = new Date();
         console.log('驗證 token 時間:', now);
         console.log('驗證 token 過期時間:', user.token_expires_at);
+        
         if(!user.isVerified && user.token_expires_at < now) {
             // 超過一小時沒有點擊連結
             // 跳轉到驗證過期的頁面跳轉到驗證過期的頁面
@@ -122,8 +126,6 @@ const verifyToken = async(req, res) => {
         if(user.isVerified) {
             req.flash('success_msg', '您的帳號已經驗證過了，請直接登入');
             console.log(`Path: ${req.path}`);
-            // console.log(`Success messages:`, successMsg);
-            // console.log(`Warning messages:`, warningMsg);
             return res.redirect('/users/login');
         }
 
@@ -133,14 +135,11 @@ const verifyToken = async(req, res) => {
         user.isVerified = true;
         await user.save();
         req.flash('success_msg', '您的帳號已成功驗證，請登入');
-        res.redirect('/users/login')
+        return res.redirect('/users/login')
         
     } catch (error) {
         console.log('驗證錯誤');
-        res.status(500).json({
-            success:false,
-            message:error.message
-        })
+        return res.redirect('/users/verify-expired');
     }
 }
 
