@@ -710,7 +710,7 @@ const showToast = (message, type = 'success') => {
         if (toast.parentNode) {
             toast.remove();
         }
-    }, 3000);
+    }, 1000);
 }
 
 /**
