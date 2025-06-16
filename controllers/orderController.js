@@ -233,6 +233,11 @@ const getCheckoutSuccess = async(req,res)=>{
                 }
             })
         }
+
+        // add subtotal into each cartItem in cart
+        cart.forEach(item => {
+            item.subtotal = item.price * item.quantity;
+        })
         
         // 2. sendgrid 寄信給user
         const to = orderInfo.customerInfo.email;
