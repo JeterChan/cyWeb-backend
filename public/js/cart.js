@@ -181,7 +181,7 @@ function handleProductQtyIncrease(productNumber) {
         input.classList.add('quantity-changed');
         setTimeout(() => input.classList.remove('quantity-changed'), 200);
     } else {
-        showToast(`最多只能選擇 ${maxQty} 件`, 'warning');
+        // showToast(`最多只能選擇 ${maxQty} 件`, 'warning');
         // 按鈕震動效果
         const button = document.querySelector(`.qty-increase-btn[data-product-number="${productNumber}"]`);
         button.classList.add('btn-shake');
@@ -725,14 +725,14 @@ function bindClearCartButton() {
             try {
                 const res = await fetch('/cart/clear', { method: 'DELETE' });
                 if (res.ok) {
-                    showToast('購物車已清空', 'success');
+                    // showToast('購物車已清空', 'success');
                     updateCartUI(0, [], 0); // UI reset
                 } else {
-                    showToast('清空購物車失敗', 'danger');
+                    // showToast('清空購物車失敗', 'danger');
                 }
             } catch (err) {
                 console.error('清空購物車錯誤:', err);
-                showToast('發生錯誤，請稍後再試', 'danger');
+                // showToast('發生錯誤，請稍後再試', 'danger');
             }
         });
     }
