@@ -746,57 +746,61 @@ function bindClearCartButton() {
  * @param {number} totalItemCount - 購物車商品總數量
  */
 const updateCartUI = (cartItemCount, cart, totalItemCount) => {
-    const cartBtn = document.querySelector('button[data-bs-target="#cartModal"]');
-    let cartBadge = cartBtn.querySelector('.badge');
     const cartModalBody = document.querySelector('#cartModal .modal-body');
     const cartModalFooter = document.querySelector('#cartModal .modal-footer');
+    const cartBadge = document.querySelector('.floating-cart-container .badge');
 
-    // 建立徽章
-    if (!cartBadge) {
-        cartBadge = document.createElement('span');
-        cartBadge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
-        cartBtn.appendChild(cartBadge);
-    }
+    // 如果 modal 不存在，也直接返回
+    if (!cartModalBody || !cartModalFooter) return;
 
     // 更新徽章
-    if (cartItemCount > 0) {
-        cartBadge.textContent = cartItemCount;
-        cartBadge.classList.remove('d-none');
-    } else {
-        cartBadge.classList.add('d-none');
+    if (cartBadge) {
+        if (cartItemCount > 0) {
+            cartBadge.textContent = cartItemCount > 99 ? '99+' : cartItemCount;
+            cartBadge.style.display = 'flex';
+        } else {
+            cartBadge.style.display = 'none';
+        }
     }
 
+
     if (Array.isArray(cart) && cart.length > 0) {
-        let total = 0;
+        let totalPrice = 0;
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
         const rows = cart.map(item => {
             const subtotal = item.price * item.quantity;
-            total += subtotal;
-
+            totalPrice += subtotal;
             return `
-            <tr data-product-id="${item.productId}">
-                <td>
-                    <div class="d-flex align-items-center">
-                        ${item.image ? `<img src="${item.image}" class="me-2" style="width:40px;height:40px;object-fit:cover;">` : ''}
-                        <span>${item.name}</span>
+            <tr class="cart-item-row" data-product-id="${item.productId}">
+                <td data-label="商品">
+                    <div class="product-info">
+                        ${item.image ? `<img src="${item.image}" alt="${item.name}" class="product-image me-3">` : ''}
+                        <span class="product-name">${item.name}</span>
                     </div>
                 </td>
-                <td class="text-center">
-                    <div class="input-group input-group-sm justify-content-center" style="max-width: 140px; margin: 0 auto;">
+                <td data-label="數量" class="text-center">
+                    <div class="input-group quantity-control">
                         <button class="btn btn-outline-secondary btn-qty-decrease" type="button" data-product-id="${item.productId}">
                             <i class="bi bi-dash"></i>
                         </button>
-                        <input type="number" class="form-control text-center qty-input"
-                            value="${item.quantity}" min="1" max="99"
-                            data-product-id="${item.productId}" style="max-width: 60px;" readonly>
+                        <input 
+                            type="number" 
+                            class="form-control text-center qty-input" 
+                            value="${item.quantity}" 
+                            min="1"
+                            max="99"
+                            data-product-id="${item.productId}"
+                            readonly 
+                        >
                         <button class="btn btn-outline-secondary btn-qty-increase" type="button" data-product-id="${item.productId}">
                             <i class="bi bi-plus"></i>
                         </button>
                     </div>
                 </td>
-                <td class="text-end">NT$ ${item.price.toLocaleString()}</td>
-                <td class="text-end subtotal-cell">NT$ ${(subtotal).toLocaleString()}</td>
-                <td class="text-center">
+                <td data-label="單價" class="text-end">NT$ ${item.price.toLocaleString()}</td>
+                <td data-label="小計" class="text-end subtotal-cell">NT$ ${subtotal.toLocaleString()}</td>
+                <td data-label="操作" class="text-center">
                     <button class="btn btn-sm btn-outline-danger btn-remove-item" data-product-id="${item.productId}">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -805,11 +809,11 @@ const updateCartUI = (cartItemCount, cart, totalItemCount) => {
         }).join('');
 
         cartModalBody.innerHTML = `
-            <div class="table-responsive">
-                <table class="table table-hover">
+            <div class="cart-table-container">
+                <table class="table cart-table">
                     <thead class="table-light">
                         <tr>
-                            <th>商品名稱</th>
+                            <th>商品</th>
                             <th class="text-center">數量</th>
                             <th class="text-end">單價</th>
                             <th class="text-end">小計</th>
@@ -819,41 +823,45 @@ const updateCartUI = (cartItemCount, cart, totalItemCount) => {
                     <tbody>${rows}</tbody>
                 </table>
             </div>
-            <div class="border-top pt-3">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="text-muted mb-1">共 <span id="total-items">${totalItemCount}</span> 件商品</p>
+            <div class="cart-summary">
+                <div class="row g-2">
+                    <div class="col-sm-6 text-muted">
+                        共 <span id="total-items">${totalItems}</span> 件商品
                     </div>
-                    <div class="col-md-6 text-end">
-                        <h5 class="fw-bold text-primary mb-0">總金額: NT$ <span id="total-price">${total.toLocaleString()}</span></h5>
+                    <div class="col-sm-6 text-sm-end">
+                        <h5 class="fw-bold text-primary mb-0">
+                            總金額: NT$ <span id="total-price">${totalPrice.toLocaleString()}</span>
+                        </h5>
                     </div>
                 </div>
             </div>
         `;
 
         cartModalFooter.innerHTML = `
-            <button id="clear-cart-btn" class="btn btn-outline-danger me-auto">清空購物車</button>
+            <button id="clear-cart-btn" class="btn btn-outline-danger">清空購物車</button>
             <div class="d-flex gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
                 <a href="/orders/personal-info" class="btn btn-primary">前往結帳</a>
             </div>
         `;
 
-        // 綁定清空購物車按鈕
-        bindClearCartButton();
-
     } else {
         // 空購物車處理
         cartModalBody.innerHTML = `
-            <div class="text-center py-5">
+            <div class="cart-empty">
                 <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
                 <h6 class="text-muted">您的購物車目前是空的</h6>
-                <p class="text-muted">快去選購您喜歡的商品吧！</p>
+                <p class="text-muted small">快去選購您喜歡的商品吧！</p>
             </div>
         `;
 
         cartModalFooter.innerHTML = `
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
+            <div></div> <!-- Placeholder for alignment -->
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
+            </div>
         `;
     }
+    // 不論購物車是否為空，都需要綁定清空按鈕（如果存在）
+    bindClearCartButton();
 };
