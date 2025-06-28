@@ -1,0 +1,136 @@
+<!-- 
+  訂單確認頁 Body
+  顏色風格: 奶白杏色系 (主背景: #FAF7F2)
+  框架: Bootstrap 5
+-->
+<!-- <style>
+  /* 方便預覽的自訂顏色 */
+  body {
+    background-color: #FAF7F2; /* 柔和的杏色背景 */
+  }
+  .card {
+    border: 1px solid #EAE0D5; /* 卡片邊框使用較深的杏色 */
+  }
+  .card-header, .list-group-item {
+    background-color: #FFFFFF; /* 卡片內部維持白色，保持內容清晰 */
+  }
+  .btn-apricot {
+    background-color: #DDAF7B; /* 溫暖的杏色按鈕 */
+    border-color: #DDAF7B;
+    color: #FFFFFF;
+  }
+  .btn-apricot:hover {
+    background-color: #C89B6A;
+    border-color: #C89B6A;
+    color: #FFFFFF;
+  }
+</style> -->
+
+<div class="container my-4 my-lg-5">
+  <div class="row">
+    <div class="col-12 text-center mb-4">
+      <h1 class="fw-light">確認您的訂單</h1>
+      <p class="text-muted">請確認以下訂單資訊，完成最後的結帳步驟。</p>
+    </div>
+  </div>
+
+  <!-- 使用 form 標籤將所有資訊包起來，方便一次提交 -->
+  <form action="/orders/place-order" method="POST">
+    <div class="row g-4">
+      <!-- 左側欄：訂單商品 & 金額摘要 -->
+      <div class="col-lg-7">
+        <!-- 訂單商品列表 -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header py-3">
+            <h5 class="my-0 fw-normal">訂單商品</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <!-- 使用 EJS 迴圈來顯示購物車中的所有商品 -->
+              <% cart.forEach(item => { %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="my-0"><%= item.name %></h6>
+                    <small class="text-muted">數量: <%= item.quantity %></small>
+                  </div>
+                  <span class="text-muted">$<%= item.price * item.quantity %></span>
+                </li>
+              <% }) %>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 金額摘要 -->
+        <div class="card shadow-sm">
+          <div class="card-header py-3">
+            <h5 class="my-0 fw-normal">金額摘要</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between">
+                <span>商品小計</span>
+                <strong>$<%= subtotal %></strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between">
+                <span>運費</span>
+                <strong>$<%= shippingFee %></strong>
+              </li>
+              <li class="list-group-item d-flex justify-content-between fs-5 text-primary">
+                <span><strong>總計</strong></span>
+                <strong>$<%= total %></strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側欄：顧客資訊 & 備註 -->
+      <div class="col-lg-5">
+        <!-- 訂購資訊 -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header py-3">
+            <h5 class="my-0 fw-normal">訂購資訊</h5>
+          </div>
+          <ul class="list-group list-group-flush">
+            <% if(customerInfo.company) { %>
+            <li class="list-group-item"><strong>訂購單位:</strong> <%= customerInfo.company %></li>
+            <% } %>
+            <li class="list-group-item"><strong>訂購人:</strong> <%= customerInfo.contactPerson%></li>
+            <li class="list-group-item"><strong>電子信箱:</strong> <%= customerInfo.email %></li>
+            <li class="list-group-item"><strong>聯絡電話:</strong> <%= customerInfo.phone %></li>
+            <% if(customerInfo.invoiceTitle) { %>
+                <li class="list-group-item"><strong>發票抬頭:</strong> <%= customerInfo.invoiceTitle %></li>
+            <% } %>
+            <% if(customerInfo.taxId) { %>
+                <li class="list-group-item"><strong>統一編號:</strong> <%= customerInfo.taxId %></li>
+            <% } %>
+            <li class="list-group-item"><strong>配送地址:</strong> <%= delivery.addressZipCode %> <%= delivery.customerAddress %></li>
+            <li class="list-group-item"><strong>付款方式:</strong> <%= getPaymentMethodLabel(paymentMethod) %></li>
+          </ul>
+        </div>
+        
+        <!-- � 訂單備註欄位 -->
+        <div class="card shadow-sm">
+          <div class="card-header py-3">
+            <h5 class="my-0 fw-normal">訂單備註</h5>
+          </div>
+          <div class="card-body">
+            <p class="card-text text-muted small">若有特殊需求，例如：希望的到貨時段、需開立公司統編等，請填寫於此。</p>
+            <textarea 
+              name="notes" 
+              class="form-control" 
+              rows="4" 
+              placeholder="請在此輸入您的備註..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- 提交按鈕 -->
+        <div class="d-grid gap-2 mt-4">
+          <a href="/orders/payment" class="btn btn-outline-secondary">上一步</a>
+          <button type="submit" class="btn btn-primary">送出訂單</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

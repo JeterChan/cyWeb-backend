@@ -22,19 +22,27 @@
         </nav>
     </div>
 
+    <!-- 商品篩選側邊欄 -->
     <div class="col-md-3 mb-4">
-        <!-- 子類別選擇器 -->
-        <div class="card">
+        <div class="card filter-card">
             <div class="card-body">
                 <% if (typeof currentCategory !== 'undefined' && currentCategory && typeof subcategories !== 'undefined' && subcategories.length > 0) { %>
-                    <h5 class="card-title">
-                        <i class="bi bi-tag"><%= getCategoryLabel(currentCategory) %></i>
-                    </h5>
+                    <!-- ✨ 修改區塊開始 ✨ -->
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-tag"></i> <%= getCategoryLabel(currentCategory) %>
+                        </h5>
+                        <!-- 新增的返回按鈕 -->
+                        <a href="/products" class="btn btn-sm btn-outline-secondary" title="返回所有分類">
+                            <i class="bi bi-arrow-left"></i> 返回
+                        </a>
+                    </div>
+                    <!-- ✨ 修改區塊結束 ✨ -->
+                    
                     <p class="text-muted small mb-3">
                         "<%= getCategoryLabel(currentCategory) %>" 的子分類
                     </p>
                     
-                    <!-- 子類別按鈕列表 -->
                     <div class="subcategory-buttons">
                         <% subcategories.forEach(function(subcategory) { %>
                             <div class="d-grid mb-2">
@@ -42,8 +50,6 @@
                                    class="btn <%= currentSubcategory === subcategory.slug ? 'btn-primary' : 'btn-outline-primary' %> btn-sm text-start position-relative">
                                     <i class="bi bi-folder"></i>
                                     <%= subcategory.name %>
-                                    
-                                    <!-- 當前選中指示器 -->
                                     <% if (currentSubcategory === subcategory.slug) { %>
                                         <span class="position-absolute top-50 end-0 translate-middle-y me-2">
                                             <i class="bi bi-check-circle-fill text-white"></i>
@@ -54,7 +60,6 @@
                         <% }); %>
                     </div>
                     
-                    <!-- 當前選擇狀態 -->
                     <div class="mt-3 pt-3 border-top">
                         <small class="text-muted">
                             <i class="bi bi-info-circle"></i> 
@@ -68,7 +73,6 @@
                     </div>
                     
                 <% } else if (typeof currentCategory !== 'undefined' && currentCategory) { %>
-                    <!-- 該類別沒有子類別 -->
                     <h5 class="card-title">
                         <i class="bi bi-tag"></i> <%= currentCategory %>
                     </h5>
@@ -80,7 +84,6 @@
                     </div>
                     
                 <% } else { %>
-                    <!-- 所有商品頁面 - 顯示主要類別 -->
                     <h5 class="card-title">
                         <i class="bi bi-grid-3x3-gap"></i> 商品分類
                     </h5>
@@ -113,8 +116,8 @@
         </div>
     </div>
     
+    <!-- 商品列表 -->
     <div class="col-md-9">
-        <!-- 當前類別和排序 -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <% if (typeof currentCategory !== 'undefined' && currentCategory) { %>
@@ -131,7 +134,6 @@
             </div>
         </div>
         
-        <!-- 產品卡片列表 -->
         <div class="row row-cols-1 row-cols-md-3 g-4" id="products-container">
             <% products.forEach(function(product) { %>
                 <div class="col product-card" 
@@ -144,7 +146,6 @@
                                  class="card-img-top" 
                                  alt="<%= product.name %>"
                                  style="height: 200px; object-fit: cover;">
-                            <!-- 可以加入商品標籤或折扣標示 -->
                             <% if (product.isOnSale) { %>
                                 <span class="position-absolute top-0 end-0 badge bg-danger m-2">
                                     特價
@@ -153,11 +154,10 @@
                         </div>
                         
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-truncate" title="<%= product.name %>">
+                            <h5 class="card-title text-truncate fw-bold" title="<%= product.name %>">
                                 <%= product.name %>
                             </h5>
                             
-                            <!-- 商品價格 -->
                             <div class="mb-2">
                                 <span class="h5 text-primary fw-bold">NT$ <%= product.basePrice.toLocaleString() %></span>
                                 <% if (product.originalPrice && product.originalPrice > product.basePrice) { %>
@@ -167,70 +167,40 @@
                                 <% } %>
                             </div>
                             
-                            <!-- 商品描述（如果有的話） -->
                             <% if (product.description) { %>
                                 <p class="card-text text-muted small flex-grow-1">
                                     <%= product.description.length > 80 ? product.description.substring(0, 80) + '...' : product.description %>
                                 </p>
                             <% } %>
                             
-                            <!-- 庫存狀態 -->
-                            <div class="mb-2">
-                                <% if (product.quantity > 0) { %>
-                                    <small class="text-success">
-                                        <i class="bi bi-check-circle-fill"></i> 現貨供應
-                                    </small>
-                                <% } else { %>
-                                    <small class="text-danger">
-                                        <i class="bi bi-x-circle-fill"></i> 暫時缺貨
-                                    </small>
-                                <% } %>
-                            </div>
-                            
-                            <!-- 操作按鈕 -->
                             <div class="mt-auto">
-                                <!-- 查看詳情按鈕 -->
                                 <div class="d-grid mb-2">
                                     <a href="/products/<%= product.productNumber %>" 
-                                       class="btn btn-outline-primary btn-sm">
+                                       class="btn btn-outline-secondary btn-sm">
                                         <i class="bi bi-eye"></i> 查看詳情
                                     </a>
                                 </div>
                                 
                                 <% if (product.quantity > 0) { %>
-                                    <!-- 數量選擇和加入購物車 -->
                                     <div class="quantity-cart-section">
-                                        <!-- 數量控制器 -->
                                         <div class="input-group input-group-sm mb-2">
-                                            <button class="btn btn-outline-secondary qty-decrease-btn" 
-                                                    type="button" 
-                                                    data-product-number="<%= product.productNumber %>">
+                                            <button class="btn btn-secondary qty-decrease-btn" type="button" data-product-number="<%= product.productNumber %>">
                                                 <i class="bi bi-dash"></i>
                                             </button>
                                             <input type="number" 
                                                    class="form-control text-center product-qty-input" 
                                                    value="1" 
                                                    min="1" 
-                                                   max="<%= Math.min(product.quantity, 99) %>"
+                                                   max="99"
                                                    data-product-number="<%= product.productNumber %>"
                                                    readonly>
-                                            <button class="btn btn-outline-secondary qty-increase-btn" 
-                                                    type="button" 
-                                                    data-product-number="<%= product.productNumber %>">
+                                            <button class="btn btn-secondary qty-increase-btn" type="button" data-product-number="<%= product.productNumber %>">
                                                 <i class="bi bi-plus"></i>
                                             </button>
                                         </div>
                                         
-                                        <!-- 庫存提示 -->
-                                        <div class="text-center mb-2">
-                                            <small class="text-muted">
-                                                庫存：<%= product.quantity %> 件
-                                            </small>
-                                        </div>
-                                        
-                                        <!-- 加入購物車按鈕 -->
                                         <div class="d-grid">
-                                            <button class="btn btn-success btn-sm add-to-cart-btn"
+                                            <button class="btn btn-primary btn-sm add-to-cart-btn"
                                                     data-product-number="<%= product.productNumber %>"
                                                     data-product-name="<%= product.name %>"
                                                     data-product-price="<%= product.basePrice %>"
@@ -240,7 +210,6 @@
                                         </div>
                                     </div>
                                 <% } else { %>
-                                    <!-- 缺貨狀態 -->
                                     <div class="d-grid">
                                         <button class="btn btn-secondary btn-sm" disabled>
                                             <i class="bi bi-cart-x"></i> 暫時缺貨
@@ -254,7 +223,6 @@
             <% }); %>
         </div>
         
-        <!-- 如果沒有商品 -->
         <% if (products.length === 0) { %>
             <div class="text-center py-5">
                 <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
@@ -264,12 +232,11 @@
             </div>
         <% } %>
         
-        <!-- 分頁 -->
         <%- include('../partials/pageNumber') %>
     </div>
 </div>
 
-<!-- 載入狀態遮罩（用於篩選時顯示） -->
+<!-- 載入狀態遮罩 -->
 <div id="loading-overlay" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50" style="z-index: 9999;">
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="spinner-border text-light" role="status">

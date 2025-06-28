@@ -8,9 +8,7 @@ const passportConfig = require('./config/passport');
 const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
-const csurf = require('csurf');
-const fs = require('fs');
-const path = require('path');
+
 
 // swagger
 const swaggerUi = require('swagger-ui-express');
@@ -78,7 +76,4 @@ app.use((req, res, next) => {
 });
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server listening on "http://localhost:${process.env.PORT}"`);
-    console.log(`Swagger API docs at "http://localhost:${process.env.PORT}/api-docs"`);
-});
+app.listen(process.env.PORT || 8080);

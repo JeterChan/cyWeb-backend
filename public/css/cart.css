@@ -1,0 +1,138 @@
+/* --- 通用購物車樣式 --- */
+.cart-table-container {
+    /* 讓表格在必要時可以水平滾動，避免內容溢出 */
+    overflow-x: auto;
+}
+
+.cart-table .product-info {
+    /* 使用 flex 讓圖片和商品名稱並排 */
+    display: flex;
+    align-items: center;
+    min-width: 250px; /* 避免在窄螢幕下，商品資訊被過度壓縮 */
+}
+
+.cart-table .product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 0.375rem; /* Bootstrap 預設的圓角 */
+    margin-right: 1rem;
+}
+
+.cart-table .quantity-control {
+    /* 數量控制器的最大寬度，使其在表格中置中 */
+    max-width: 150px;
+    margin: 0 auto;
+}
+
+.cart-table .quantity-control .qty-input {
+    /* 數量輸入框的寬度 */
+    max-width: 60px;
+    text-align: center;
+}
+
+/* 移除 number input 在 Webkit 和 Firefox 中的上下箭頭 */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.qty-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* 訂單總結區塊的樣式 */
+.cart-summary {
+    border-top: 1px solid #dee2e6; /* Bootstrap 表格的分隔線顏色 */
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* 購物車為空時的提示訊息 */
+.cart-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    border: 2px dashed #e9ecef;
+    border-radius: 0.5rem;
+}
+
+
+/* --- 響應式設計 (RWD)：當螢幕寬度小於 768px 時生效 --- */
+@media (max-width: 767.98px) {
+    /* 1. 隱藏桌面版的表格標頭 */
+    .cart-table thead {
+        display: none;
+    }
+
+    /* 2. 將表格的 row 變成卡片樣式，垂直排列 */
+    .cart-table tbody,
+    .cart-table tr,
+    .cart-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .cart-table tr.cart-item-row {
+        margin-bottom: 1.5rem; /* 卡片之間的間距 */
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* 3. 設定每個儲存格(td)的樣式 */
+    .cart-table td {
+        display: flex;
+        justify-content: space-between; /* 讓標籤和內容左右分開 */
+        align-items: center;
+        padding: 0.8rem;
+        text-align: right; /* 內容預設靠右 */
+        border: none;
+        border-bottom: 1px dashed #e9ecef; /* 卡片內部用虛線分隔 */
+    }
+    
+    .cart-table tr.cart-item-row td:last-child {
+        border-bottom: none; /* 最後一項不需要底線 */
+    }
+
+    /* 4. 使用 data-label 屬性來顯示標題，這是 RWD 表格的關鍵 */
+    .cart-table td::before {
+        content: attr(data-label); /* 讀取 td 上的 data-label 屬性內容 */
+        font-weight: 600;
+        text-align: left;
+        padding-right: 1rem;
+    }
+
+    /* 5. 針對特定欄位微調 */
+    .cart-table td[data-label="商品"] {
+        flex-direction: column;
+        align-items: flex-start;
+        border-bottom: 1px solid #dee2e6; /* 商品資訊下方用實線分隔，比較重要 */
+        margin-bottom: 0.5rem;
+    }
+    
+    .cart-table td[data-label="商品"]::before {
+        display: none; /* 商品欄位本身很清楚，不需要再顯示 "商品:" 的標題 */
+    }
+
+    .cart-table .product-info {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .cart-table .product-name {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .cart-table .quantity-control {
+        margin: 0; /* 覆蓋桌面版的 auto margin */
+        width: 100%;
+        justify-content: flex-end; /* 將數量控制器也靠右對齊 */
+    }
+    
+    /* 總結區塊在手機上靠左對齊 */
+    .cart-summary .row > div {
+        text-align: left !important;
+    }
+}

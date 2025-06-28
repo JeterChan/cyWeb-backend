@@ -1,4 +1,11 @@
-<body class="bg-light">
+<!-- 
+    修改重點：
+    1. 假設您的後端 Controller 在 render 時會傳入一個名為 `data` 的物件，
+       該物件包含了使用者先前填寫過的表單資料，例如：{ company: '...', contactPerson: '...' }
+       res.render('your-view', { data: req.session.checkoutData || {} });
+    2. 在每個 <input> 中，使用 value="<%= data.fieldName || '' %>" 來設定預設值。
+    3. `|| ''` 的作用是，如果 data 物件中沒有該欄位的資料（例如第一次進入頁面），則顯示為空字串，避免出錯。
+  -->
   <div class="container py-4">
     <a href="/" class="text-decoration-none mb-3 d-inline-block">← 回到商店</a>
     <h2 class="fw-bold mb-4">訂單結帳流程</h2>
@@ -19,7 +26,7 @@
       </div>
     </div>
 
-    <form action="/orders/step2" method="POST">
+    <form action="/orders/personal-info" method="POST">
       <div class="row g-4">
         <!-- 左側表單 -->
         <div class="col-lg-8">
@@ -28,35 +35,41 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="company" class="form-label">訂購單位</label>
-                  <input type="text" class="form-control" id="company" name="company">
+                  <!-- ✨ 修改點 -->
+                  <input type="text" class="form-control" id="company" name="company" value="<%= data.company || '' %>">
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="contactPerson" class="form-label">聯絡人<span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="contactPerson" name="contactPerson" required>
+                  <!-- ✨ 修改點 -->
+                  <input type="text" class="form-control" id="contactPerson" name="contactPerson" value="<%= data.contactPerson || '' %>" required>
                 </div>
               </div>
 
               <div class="mb-3">
                 <label for="email" class="form-label">Email<span class="text-danger">*</span></label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <!-- ✨ 修改點 -->
+                <input type="email" class="form-control" id="email" name="email" value="<%= data.email || '' %>" required>
               </div>
 
               <div class="mb-3">
                 <label for="phone" class="form-label">電話號碼<span class="text-danger">*</span></label>
-                <input type="tel" class="form-control" id="phone" name="phone" required>
+                <!-- ✨ 修改點 -->
+                <input type="tel" class="form-control" id="phone" name="phone" value="<%= data.phone || '' %>" required>
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="invoiceTitle" class="form-label">發票抬頭</label>
-                  <input type="text" class="form-control" id="invoiceTitle" name="invoiceTitle">
+                  <!-- ✨ 修改點 -->
+                  <input type="text" class="form-control" id="invoiceTitle" name="invoiceTitle" value="<%= data.invoiceTitle || '' %>">
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="taxId" class="form-label">統一編號</label>
-                  <input type="text" class="form-control" id="taxId" name="taxId">
+                  <!-- ✨ 修改點 -->
+                  <input type="text" class="form-control" id="taxId" name="taxId" value="<%= data.taxId || '' %>">
                 </div>
               </div>
-            <button type="submit" class="btn btn-gradient w-100 mt-3">下一步</button>
+            <button type="submit" class="btn btn-primary w-100 mt-3">下一步</button>
           </div>
         </div>
 
@@ -67,7 +80,6 @@
             <% cartItems.forEach(item => { %>
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="d-flex align-items-center">
-                  <!-- <img src="<%# item.imageUrl %>" alt="product image" class="order-img me-2"> -->
                   <div>
                     <div><%= item.name %></div>
                     <small class="text-muted">數量: <%= item.quantity %></small>
@@ -86,4 +98,3 @@
       </div>
     </form>
   </div>
-</body>

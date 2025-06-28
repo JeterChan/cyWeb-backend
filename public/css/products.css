@@ -1,27 +1,69 @@
-/* 產品卡片數量控制器樣式 */
+/*
+  注意：這個檔案依賴於您在 theme-cream.css 中定義的 CSS 變數。
+  請確保已載入 theme-cream.css。
+*/
+
+/* --- General Page Elements --- */
+
+/* 麵包屑導航樣式 */
+.breadcrumb {
+    background-color: var(--secondary-bg, #ffffff);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color, #e8e6e3);
+}
+.breadcrumb-item a {
+    color: var(--text-secondary, #7a7a7a);
+    text-decoration: none;
+}
+.breadcrumb-item a:hover {
+    color: var(--accent-color, #a0937d);
+}
+.breadcrumb-item.active {
+    color: var(--text-primary, #3d3d3d);
+}
+
+/* --- Filter Sidebar Styles --- */
+.filter-card {
+    background-color: var(--secondary-bg, #ffffff);
+    border: 1px solid var(--border-color, #e8e6e3);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.filter-card .btn-outline-primary {
+    /* 將預設顏色改為主題中更深的褐色 */
+    color: var(--accent-hover, #000000);
+    border-color: var(--accent-hover, #8c7f6b);
+    transition: all 0.2s ease;
+}
+.filter-card .btn-outline-primary:hover {
+    /* 滑鼠移上去時的背景色也使用這個深褐色 */
+    background-color: var(--accent-hover, #8c7f6b);
+    color: white;
+}
+/* --- Product Card Styles (from previous version) --- */
+
 .quantity-cart-section {
     transition: all 0.3s ease;
 }
 
-/* 數量輸入框動畫 */
 .product-qty-input {
     transition: all 0.2s ease;
     font-weight: 600;
 }
 
 .product-qty-input:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(160, 147, 125, 0.25);
 }
 
-/* 數量變更動畫 */
 .quantity-changed {
     transform: scale(1.1);
-    background-color: #d1e7dd !important;
-    border-color: #198754 !important;
+    background-color: #fdf5e6 !important; 
+    border-color: var(--accent-color) !important;
 }
 
-/* 按鈕震動動畫 */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-2px); }
@@ -32,15 +74,14 @@
     animation: shake 0.3s ease-in-out;
 }
 
-/* 數量控制按鈕樣式 */
 .qty-increase-btn, .qty-decrease-btn {
     transition: all 0.2s ease;
     border-radius: 0;
 }
 
 .qty-increase-btn:hover, .qty-decrease-btn:hover {
-    background-color: #198754;
-    border-color: #198754;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
     color: white;
     transform: scale(1.05);
 }
@@ -49,7 +90,6 @@
     transform: scale(0.95);
 }
 
-/* 加入購物車按鈕動畫 */
 .add-to-cart-btn {
     transition: all 0.3s ease;
     position: relative;
@@ -58,46 +98,42 @@
 
 .add-to-cart-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+    box-shadow: 0 4px 12px rgba(160, 147, 125, 0.3);
 }
 
 .add-to-cart-btn:active {
     transform: translateY(0);
 }
 
-/* 載入狀態的按鈕 */
 .add-to-cart-btn:disabled {
     transform: none;
     box-shadow: none;
 }
 
-/* 產品卡片懸停效果 */
 .product-card .card {
     transition: all 0.3s ease;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--border-color);
 }
 
 .product-card:hover .card {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    border-color: #198754;
+    box-shadow: 0 8px 25px rgba(160, 147, 125, 0.1);
+    border-color: var(--accent-color);
 }
 
-/* 庫存提示樣式 */
 .product-card .text-muted {
     font-size: 0.75rem;
 }
 
-/* 價格標籤動畫 */
 .text-primary {
     transition: color 0.2s ease;
+    color: var(--accent-color) !important;
 }
 
 .product-card:hover .text-primary {
-    color: #198754 !important;
+    color: var(--accent-hover) !important;
 }
 
-/* 響應式調整 */
 @media (max-width: 768px) {
     .product-qty-input {
         font-size: 0.875rem;
@@ -113,7 +149,6 @@
     }
 }
 
-/* 特殊狀態指示器 */
 .out-of-stock {
     opacity: 0.6;
     filter: grayscale(50%);
@@ -128,7 +163,7 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #ff6b6b;
+    background: var(--danger-color, #dc3545);
     color: white;
     padding: 2px 6px;
     border-radius: 10px;
@@ -136,14 +171,13 @@
     font-weight: 600;
 }
 
-/* 成功狀態的按鈕樣式 */
 .btn-success-state {
-    background-color: #198754 !important;
-    border-color: #198754 !important;
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
     color: white !important;
 }
 
 .btn-success-state:hover {
-    background-color: #157347 !important;
-    border-color: #146c43 !important;
+    background-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
 }

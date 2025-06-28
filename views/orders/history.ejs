@@ -26,7 +26,7 @@
               <td><%= getOrderStatusLabel(order.status) %></td>
               <td>$<%= Math.floor(order.totalAmount).toLocaleString('zh-TW') %></td>
               <td>
-                <a href="/orders/<%= order.orderNumber %>" class="btn btn-sm btn-outline-primary">查看</a>
+                <a href="/orders/<%= order.orderNumber %>" class="btn btn-sm btn-secondary">查看</a>
               </td>
             </tr>
           <% }) %>

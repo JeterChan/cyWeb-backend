@@ -1,3 +1,11 @@
+<!-- 
+    修改重點：
+    1. 假設後端 Controller 在 render 此頁面時，會傳入一個名為 `data` 的物件，
+       該物件包含了使用者在所有步驟中填寫過的資料。
+       例如：res.render('step2', { data: req.session.checkoutData || {} });
+    2. 在每個 <input> 中，使用 value="<%= data.fieldName || '' %>" 來設定預設值。
+    3. `|| ''` 確保在沒有舊資料時，欄位會是空的。
+-->
 <body class="bg-light">
   <div class="container py-4">
     <a href="/" class="text-decoration-none mb-3 d-inline-block">← 回到商店</a>
@@ -19,7 +27,7 @@
       </div>
     </div>
 
-    <form action="/orders/step3" method="POST">
+    <form action="/orders/address" method="POST">
       <div class="row g-4">
         <!-- 收件地址 -->
         <div class="col-lg-8">
@@ -28,23 +36,27 @@
 
             <div class="mb-3">
               <label for="street" class="form-label">地址</label>
-              <input type="text" class="form-control" id="street" name="street" placeholder="123 Main Street" required>
+              <!-- ✨ 修改點 -->
+              <input type="text" class="form-control" id="street" name="street" placeholder="忠孝東路四段100號" value="<%= data.street || '' %>" required>
             </div>
 
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="city" class="form-label">縣市</label>
-                <input type="text" class="form-control" id="city" name="city" placeholder="New York" required>
+                <!-- ✨ 修改點 -->
+                <input type="text" class="form-control" id="city" name="city" placeholder="台北市" value="<%= data.city || '' %>" required>
               </div>
               <div class="col-md-6 mb-3">
                 <label for="zip" class="form-label">郵遞區號</label>
-                <input type="text" class="form-control" id="zip" name="zip" placeholder="10001" required>
+                <!-- ✨ 修改點 -->
+                <input type="text" class="form-control" id="zip" name="zip" placeholder="106" value="<%= data.zip || '' %>" required>
               </div>
             </div>
 
             <div class="d-flex justify-content-between">
-              <a href="/orders/step1" class="btn btn-outline-secondary">上一步</a>
-              <button type="submit" class="btn btn-gradient">下一步</button>
+              <!-- This link assumes you have a GET route for the previous step -->
+              <a href="/orders/personal-info" class="btn btn-secondary">上一步</a>
+              <button type="submit" class="btn btn-primary">下一步</button>
             </div>
           </div>
         </div>
@@ -56,7 +68,6 @@
             <% cartItems.forEach(item => { %>
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="d-flex align-items-center">
-                  <!-- <img src="<%# item.imageUrl %>" alt="product image" class="order-img me-2"> -->
                   <div>
                     <div><%= item.name %></div>
                     <small class="text-muted">數量: <%= item.quantity %></small>

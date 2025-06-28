@@ -50,10 +50,10 @@ const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 
-// GET: checkout-step1 page
+// GET: checkout-personal-info page
 /**
  * @swagger
- * /orders/step1:
+ * /orders/personal-info:
  *   get:
  *     summary: 結帳第一步 - 顯示收件人/聯絡資訊頁面
  *     tags: [Order]
@@ -61,11 +61,13 @@ const orderController = require('../controllers/orderController');
  *       200:
  *         description: 成功取得頁面（或表單資料）
  */
-router.get('/step1', orderController.readCheckoutPage);
-// POST: checkout-step2 page
+router.get('/personal-info', orderController.getCheckoutPage);
+router.post('/personal-info', orderController.postPersonalInfo);
+
+// POST: checkout-address page
 /**
  * @swagger
- * /orders/step2:
+ * /orders/address:
  *   post:
  *     summary: 結帳第二步 - 處理運送/付款方式選擇
  *     tags: [Order]
@@ -84,12 +86,12 @@ router.get('/step1', orderController.readCheckoutPage);
  *       200:
  *         description: 進入結帳步驟2（回傳下一步資料）
  */
-
-router.post('/step2', orderController.getCheckoutStep2);
-// POST: checkout-step3 page
+router.get('/address', orderController.getCheckoutStep2);
+router.post('/address', orderController.postCheckoutStep2);
+// POST: checkout-payment page
 /**
  * @swagger
- * /orders/step3:
+ * /orders/payment:
  *   post:
  *     summary: 結帳第三步 - 確認訂單明細
  *     tags: [Order]
@@ -108,11 +110,15 @@ router.post('/step2', orderController.getCheckoutStep2);
  *       200:
  *         description: 顯示訂單明細頁
  */
-router.post('/step3',orderController.getCheckoutStep3);
+router.get('/payment', orderController.getCheckoutStep3);
+router.post('/payment',orderController.postCheckoutStep3);
+
+router.get('/confirmation', orderController.postCheckoutConfirmation);
+
 // POST: checkout-success page
 /**
  * @swagger
- * /orders/submit:
+ * /orders/place-order:
  *   post:
  *     summary: 結帳完成 - 提交訂單
  *     tags: [Order]
@@ -133,7 +139,7 @@ router.post('/step3',orderController.getCheckoutStep3);
  *             schema:
  *               $ref: '#/components/schemas/Order'
  */
-router.post('/submit', orderController.getCheckoutSuccess);
+router.post('/place-order', orderController.getCheckoutSuccess);
 // GET: get order history
 /**
  * @swagger

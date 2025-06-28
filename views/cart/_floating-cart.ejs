@@ -1,0 +1,129 @@
+<!-- 
+  建議在您的主要佈局檔案 <head> 中引入 floating-cart.css
+  <link rel="stylesheet" href="/css/floating-cart.css"> 
+-->
+
+<!-- 浮動購物車按鈕 -->
+<div class="floating-cart-container">
+    <button type="button" class="btn btn-primary btn-lg rounded-circle shadow-lg" data-bs-toggle="modal" data-bs-target="#cartModal">
+        <i class="bi bi-cart"></i>
+        <% if(typeof cartItemCount !== 'undefined' && cartItemCount > 0) { %>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <%= cartItemCount || '' %>
+            <span class="visually-hidden">購物車商品數量</span>
+        </span>
+        <% } %>
+    </button>
+</div>
+
+
+<!-- 購物車 Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cartModalLabel">
+                    <i class="fas fa-shopping-cart me-2"></i>購物車
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <% if(typeof cart !== 'undefined' && Array.isArray(cart) && cart.length > 0) { %>
+                    <div class="cart-table-container">
+                        <table class="table cart-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>商品</th>
+                                    <th class="text-center">數量</th>
+                                    <th class="text-end">單價</th>
+                                    <th class="text-end">小計</th>
+                                    <th class="text-center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <%
+                            let totalPrice = 0;
+                            cart.forEach((item) => {
+                                let subtotal = item.price * item.quantity;
+                                totalPrice += subtotal;
+                            %>
+                                <tr class="cart-item-row" data-product-id="<%= item.productId %>">
+                                    <td data-label="商品">
+                                        <div class="product-info">
+                                            <% if(item.image) { %>
+                                                <img src="<%= item.image %>" alt="<%= item.name %>" class="product-image me-3">
+                                            <% } %>
+                                            <span class="product-name"><%= item.name %></span>
+                                        </div>
+                                    </td>
+                                    <td data-label="數量" class="text-center">
+                                        <div class="input-group quantity-control">
+                                            <button class="btn btn-outline-secondary btn-qty-decrease" type="button" data-product-id="<%= item.productId %>">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input 
+                                                type="number" 
+                                                class="form-control text-center qty-input" 
+                                                value="<%= item.quantity %>" 
+                                                min="1"
+                                                max="99"
+                                                data-product-id="<%= item.productId %>"
+                                                readonly 
+                                            >
+                                            <button class="btn btn-outline-secondary btn-qty-increase" type="button" data-product-id="<%= item.productId %>">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td data-label="單價" class="text-end">NT$ <%= item.price.toLocaleString() %></td>
+                                    <td data-label="小計" class="text-end subtotal-cell">NT$ <%= subtotal.toLocaleString() %></td>
+                                    <td data-label="操作" class="text-center">
+                                        <button class="btn btn-sm btn-outline-danger btn-remove-item" data-product-id="<%= item.productId %>">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 總價區域 -->
+                    <div class="cart-summary">
+                        <div class="row g-2">
+                            <div class="col-sm-6 text-muted">
+                                共 <span id="total-items"><%= cart.reduce((sum, item) => sum + item.quantity, 0) %></span> 件商品
+                            </div>
+                            <div class="col-sm-6 text-sm-end">
+                                <h5 class="fw-bold text-primary mb-0">
+                                    總金額: NT$ <span id="total-price"><%= totalPrice.toLocaleString() %></span>
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="cart-empty">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">您的購物車目前是空的</h6>
+                        <p class="text-muted small">快去選購您喜歡的商品吧！</p>
+                    </div>
+                <% } %>
+            </div>
+            <!-- 修正：簡化 modal-footer 結構，確保左右佈局穩定 -->
+            <div class="modal-footer">
+                <% if(typeof cart !== 'undefined' && Array.isArray(cart) && cart.length > 0) { %>
+                    <button id="clear-cart-btn" class="btn btn-outline-danger">清空購物車</button>
+                <% } else { %>
+                    <!-- 當購物車為空時，用一個空 div 佔位，以確保右側按鈕位置正確 -->
+                    <div></div>
+                <% } %>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">繼續購物</button>
+                    <% if(typeof cart !== 'undefined' && Array.isArray(cart) && cart.length > 0) { %>
+                        <a href="/orders/personal-info" class="btn btn-primary">前往結帳</a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

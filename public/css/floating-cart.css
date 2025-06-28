@@ -1,0 +1,43 @@
+/* --- Floating Cart Button (using theme variables) --- */
+.floating-cart-container {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1040;
+}
+
+.floating-cart-container .btn {
+  /* 將預設顏色改為主題中較深的褐色 */
+  background-color: var(--accent-hover, #342e26);
+  border-color: var(--accent-hover, #716654);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.floating-cart-container .btn:hover {
+  transform: scale(1.1);
+  /* 設定一個更深的顏色作為滑鼠懸停效果 */
+  background-color: #5a5244;
+  border-color: #5a5244;
+}
+
+/* 調整小紅點徽章的位置 */
+.floating-cart-container .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.6em;
+  background-color: var(--danger-color) !important;
+}
+
+/* --- Cart Modal Styles (其餘不變) --- */
+#cartModal .modal-content {
+  background-color: var(--secondary-bg, #ffffff);
+  color: var(--text-primary, #3d3d3d);
+  border: 1px solid var(--border-color, #e8e6e3);
+  border-radius: 0.75rem;
+}
+/* ... (以下 modal 樣式省略) ... */

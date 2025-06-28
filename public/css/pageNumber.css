@@ -1,0 +1,53 @@
+/*
+  注意：這個檔案依賴於您在 theme.css 中定義的 CSS 變數。
+  請確保已載入 theme-cream.css。
+*/
+
+/* --- Pagination Styles (Creamy Theme) --- */
+.pagination .page-link {
+    color: var(--accent-color, #8c7f6b); /* 使用主題強調色 */
+    background-color: var(--secondary-bg, #ffffff);
+    border: 1px solid var(--border-color, #e8e6e3);
+    margin: 0 4px; /* 增加按鈕間距 */
+    border-radius: 0.375rem; /* 統一圓角 */
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.pagination .page-link:hover {
+    background-color: #fdf8f0; /* 滑鼠懸停時一個更柔和的背景色 */
+    color: var(--accent-hover, #716654);
+    border-color: var(--accent-color, #8c7f6b);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(140, 127, 107, 0.1);
+}
+
+.pagination .page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: var(--accent-color, #8c7f6b);
+    border-color: var(--accent-color, #8c7f6b);
+    box-shadow: 0 4px 12px rgba(140, 127, 107, 0.25);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #c5bfb0; /* 較淺的禁用顏色 */
+    pointer-events: none;
+    background-color: var(--secondary-bg, #ffffff);
+    border-color: var(--border-color, #e8e6e3);
+    box-shadow: none;
+}
+.pagination .page-item.disabled .page-link:hover {
+    transform: none;
+}
+
+
+/* --- RWD Adjustments --- */
+@media (max-width: 576px) {
+    .pagination {
+        /* 在小螢幕上讓按鈕更緊湊 */
+        --bs-pagination-font-size: 0.8rem;
+        --bs-pagination-padding-y: 0.3rem;
+        --bs-pagination-padding-x: 0.6rem;
+    }
+}

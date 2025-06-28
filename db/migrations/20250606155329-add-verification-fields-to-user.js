@@ -10,16 +10,16 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await Promise.all([
-      queryInterface.addColumn('Users', 'is_verified', {
+      queryInterface.addColumn('users', 'is_verified', {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: false
       }),
-      queryInterface.addColumn('Users', 'verification_token', {
+      queryInterface.addColumn('users', 'verification_token', {
         type: Sequelize.STRING,
         allowNull: true
       }),
-      queryInterface.addColumn('Users', 'token_expires_at', {
+      queryInterface.addColumn('users', 'token_expires_at', {
         type: Sequelize.DATE,
         allowNull: true
       })
@@ -34,9 +34,9 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
     await Promise.all([
-      queryInterface.removeColumn('Users', 'is_verified'),
-      queryInterface.removeColumn('Users', 'verification_token'),
-      queryInterface.removeColumn('Users', 'token_expires_at')
+      queryInterface.removeColumn('users', 'is_verified'),
+      queryInterface.removeColumn('users', 'verification_token'),
+      queryInterface.removeColumn('users', 'token_expires_at')
     ]);
   }
 };
