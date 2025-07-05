@@ -7,49 +7,123 @@
  */
 /**
  * @swagger
- * components:
- *   schemas:
- *     Order:
- *       type: object
- *       properties:
- *         orderNumber:
+ * /admin/updateStatus:
+ *   get:
+ *     summary: 獲取訂單狀態統計
+ *     tags: [Admin]
+ *     description: |
+ *       獲取各種訂單狀態的數量統計，用於後台儀表板顯示。
+ *       需要管理員權限才能存取。
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: 成功獲取訂單狀態統計
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/OrderStatusResponse'
+ *             example:
+ *               totalOrdersCount: 150
+ *               processingCount: 25
+ *               deliveredCount: 80
+ *               completedCount: 40
+ *               cancelCount: 5
+ *       401:
+ *         description: 未授權或非管理員
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "需要管理員權限"
+ *       500:
+ *         description: 伺服器內部錯誤
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "獲取訂單統計失敗"
+ */
+
+/**
+ * @swagger
+ * /admin/orders/{orderNumber}/status:
+ *   post:
+ *     summary: 更新訂單狀態
+ *     tags: [Admin]
+ *     description: |
+ *       更新指定訂單的狀態。管理員可以將訂單狀態更改為：
+ *       - pending（待處理）
+ *       - processing（處理中）
+ *       - delivered（已送達）
+ *       - completed（已完成）
+ *       - cancel（已取消）
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderNumber
+ *         required: true
+ *         schema:
  *           type: string
- *         companyName:
- *           type: string
- *         orderDate:
- *           type: string
- *         shippingAddress:
- *           type: string
- *         paymentMethod:
- *           type: string
- *         totalAmount:
- *           type: number
- *         status:
- *           type: string
- *         items:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/OrderItem'
- *     OrderItem:
- *       type: object
- *       properties:
- *         productId:
- *           type: string
- *         name:
- *           type: string
- *         spec:
- *           type: string
- *         price:
- *           type: number
- *         quantity:
- *           type: integer
- *         subtotal:
- *           type: number
- *   securitySchemes:
- *     cookieAuth:
- *       type: apiKey
- *       in: cookie
- *       name: connect.sid
+ *         description: 訂單編號
+ *         example: "ORD-2024-001"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateOrderStatusRequest'
+ *           example:
+ *             status: "delivered"
+ *     responses:
+ *       200:
+ *         description: 訂單狀態更新成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AdminSuccessResponse'
+ *             example:
+ *               success: true
+ *               message: "Order update successfully"
+ *       400:
+ *         description: 無效的訂單狀態
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "無效的訂單狀態"
+ *       401:
+ *         description: 未授權或非管理員
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "需要管理員權限"
+ *       404:
+ *         description: 找不到指定的訂單
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: "404 頁面"
+ *       500:
+ *         description: 伺服器內部錯誤
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "資料庫連接失敗"
  */
 
 const express = require('express');
@@ -58,138 +132,11 @@ const { isAdmin } = require('../middleware/authValidation');
 const adminController = require('../controllers/adminController');
 
 // 訂單列表頁
-/**
- * @swagger
- * /admin/orders:
- *   get:
- *     summary: 管理員取得訂單列表
- *     tags: [Admin]
- *     security:
- *       - cookieAuth: []  # 或寫 bearerAuth: [] 視你的驗證設計
- *     responses:
- *       200:
- *         description: 訂單列表
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Order'
- *       401:
- *         description: 未授權
- */
 router.get('/orders', isAdmin, adminController.getAdminOrdersPage);
-/**
- * @swagger
- * /orders/updateStatus:
- *   get:
- *     tags: [Admin - Order Management]
- *     summary: 更新訂單狀態
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: status
- *         required: true
- *         schema:
- *           type: string
- *           enum: [pending, processing, shipped, delivered, cancelled]
- *       - in: query
- *         name: orderNumber
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: 訂單狀態更新成功
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- */
 router.get('/updateStatus', isAdmin, adminController.getOrdersStatus);
 // 單筆訂單詳情頁
-/**
- * @swagger
- * /admin/orders/{orderNumber}:
- *   get:
- *     summary: 管理員查詢單一訂單詳情
- *     tags: [Admin]
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: orderNumber
- *         required: true
- *         schema:
- *           type: string
- *         description: 訂單編號
- *     responses:
- *       200:
- *         description: 訂單詳情
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Order'
- *       401:
- *         description: 未授權
- *       404:
- *         description: 找不到訂單
- */
 router.get('/orders/:orderNumber', isAdmin, adminController.getOrderDetail);
-
 // 刪除訂單
-/**
- * @swagger
- * /admin/orders/{orderNumber}/status:
- *   post:
- *     summary: 管理員更新訂單狀態
- *     tags: [Admin]
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: orderNumber
- *         required: true
- *         schema:
- *           type: string
- *         description: 訂單編號
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 description: 訂單新狀態（如 paid, processing, completed, cancel）
- *     responses:
- *       200:
- *         description: 狀態更新成功
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                 order:
- *                   $ref: '#/components/schemas/Order'
- *       400:
- *         description: 狀態更新失敗
- *       401:
- *         description: 未授權
- *       404:
- *         description: 找不到訂單
- */
 router.post('/orders/:orderNumber/status',isAdmin, adminController.updateOrderStatus);
-
-
 
 module.exports = router;
