@@ -7,6 +7,7 @@
     "start": "node cyWeb.js",
     "build": "npm install",
     "dev": "nodemon cyWeb.js",
+    "test": "mocha test/**/*.test.js",
     "docker:dev": "nodemon cyWeb.js",
     "migrate": "npx sequelize-cli db:migrate",
     "start:prod": "npm run migrate && npm start"
@@ -41,11 +42,15 @@
     "redis": "^4.7.0",
     "sequelize": "^6.37.5",
     "sequelize-cli": "^6.6.2",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
+    "sinon": "^21.0.0",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4"
+    "chai": "^5.2.0",
+    "mocha": "^11.7.1",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.1.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
