@@ -1,19 +1,21 @@
 # cyWeb-backend
-### website URL
+### 專案 Demo 網址
 https://cyweb-backend-staging.up.railway.app/products
+
 # 駿英電商網站後端 (cyWeb-backend)
 
-本專案為駿英電商網站的後端服務，採用 Node.js、Express、MySQL 及 Redis 技術棧開發，並以 Docker 容器化部署。主要提供會員系統、商品管理、購物車、訂單處理等核心 API，支援多種電商流程與即時資料存取。
+本專案為駿英電商網站的後端服務，採用 Node.js、Express、MySQL 及 Redis 技術開發，並以 Docker 容器化部署。主要提供會員系統、商品管理、購物車、訂單處理等核心 API，支援多種電商流程與即時資料存取。
 
 ## 專案特色
 
 - 使用 Node.js + Express 建立 RESTful API
 - 整合 MySQL 做為主要關聯式資料庫
 - Redis 作為 Session 儲存與快取，提升效能
-- 會員註冊/登入/驗證、商品 CRUD、購物車、訂單管理等完整功能
+- 採用 Passport.js 實作第三方登入和本地登入驗證、商品 CRUD API、購物車、訂單管理等完整功能
 - 採用 Docker 容器化，方便部署與環境一致性
-- 支援 Session、認證（Passport）、Email 通知等
+- 支援 Session、SendGrid API Email 通知等
 - 完善的資料庫模型設計，易於擴充
+- 提供後臺管理者統一的訂單管理，方便追蹤訂單
 
 ## 專案架構
 - `config/`：存放專案設定（DB、redis 等）
