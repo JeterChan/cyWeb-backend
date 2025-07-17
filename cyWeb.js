@@ -9,6 +9,15 @@ const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
 
+
+// swagger
+// development only
+if(process.env.NODE_ENV === 'development') {
+  const swaggerUi = require('swagger-ui-express');
+  const swaggerSpec = require('./swagger.js');
+}
+
+
 // router
 const productRouter = require('./routes/productRouter.js');
 const adminRouter = require('./routes/adminRouter.js');
@@ -47,13 +56,7 @@ app.set('layout','layouts/main');
 app.use(express.static('public'));
 
 // swagger
-// development only
-if(process.env.NODE_ENV === 'development') {
-  const swaggerUi = require('swagger-ui-express');
-  const swaggerSpec = require('./swagger.js');
-  // swagger
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-}
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // router path
 app.get('/', (req, res) => {
@@ -79,4 +82,7 @@ app.use((req, res, next) => {
 });
 
 
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT, () => {
+    console.log(`Server listening on "http://localhost:${process.env.PORT}"`);
+    console.log(`Swagger API docs at "http://localhost:${process.env.PORT}/api-docs"`);
+});
