@@ -47,6 +47,14 @@ passport.use(new LocalStrategy({ usernameField: 'email'}, async (email, password
                 message:'這個信箱沒有被註冊'
             })
         }
+
+        // 若 user 非本地註冊
+        if (!user.password) {
+            return done(null, false, {
+                type: 'warning_msg',
+                message: '請使用 Google 登入'
+            })
+        }
         // 比較 password
         const isMatch = await bcrypt.compare(password, user.password)
         // 若密碼不相等
