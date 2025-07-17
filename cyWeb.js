@@ -5,15 +5,18 @@ dotenv.config();
 
 const expressLayouts = require('express-ejs-layouts');
 const passport = require('passport');
-const passportConfig = require('./config/passport');
 const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
 
 
 // swagger
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./swagger.js');
+// development only
+if(process.env.NODE_ENV === 'development') {
+  const swaggerUi = require('swagger-ui-express');
+  const swaggerSpec = require('./swagger.js');
+}
+
 
 // router
 const productRouter = require('./routes/productRouter.js');
