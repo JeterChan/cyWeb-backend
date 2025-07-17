@@ -1,3 +1,8 @@
+<!-- 
+    修改重點：
+    1. HTML：在 radio input 中使用 EJS 判斷式 <%= data.paymentMethod === 'value' ? 'checked' : '' %> 來設定預設選中項。
+    2. JavaScript：增加頁面載入時的判斷，如果已有選中項，則立即顯示對應的說明區塊。
+-->
 <body class="bg-light">
   <div class="container py-4">
     <a href="/" class="text-decoration-none mb-3 d-inline-block">← 回到商店</a>
@@ -19,7 +24,7 @@
       </div>
     </div>
 
-    <form action="/orders/submit" method="POST">
+    <form action="/orders/payment" method="POST">
       <div class="row g-4">
         <!-- 付款方式 -->
         <div class="col-lg-8">
@@ -30,17 +35,20 @@
               <label for="paymentMethod" class="form-label">請選擇一種付款方式:</label>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank_transfer" required>
+                <!-- ✨ 修改點：加上 checked 判斷 -->
+                <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank_transfer" <%= data.method === 'bank_transfer' ? 'checked' : '' %> required>
                 <label class="form-check-label" for="bankTransfer">轉帳</label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="remittance" value="remittance">
+                <!-- ✨ 修改點：加上 checked 判斷 -->
+                <input class="form-check-input" type="radio" name="paymentMethod" id="remittance" value="remittance" <%= data.method === 'remittance' ? 'checked' : '' %>>
                 <label class="form-check-label" for="remittance">匯款</label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod">
+                <!-- ✨ 修改點：加上 checked 判斷 -->
+                <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" <%= data.method === 'cod' ? 'checked' : '' %>>
                 <label class="form-check-label" for="cod">貨到付款</label>
               </div>
             </div>
@@ -51,8 +59,8 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-              <a href="/orders/step2" class="btn btn-secondary">上一步</a>
-              <button type="submit" class="btn btn-primary">送出訂單</button>
+              <a href="/orders/address" class="btn btn-secondary">上一步</a>
+              <button type="submit" class="btn btn-primary">下一步</button>
             </div>
           </div>
         </div>
@@ -64,7 +72,6 @@
             <% cartItems.forEach(item => { %>
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="d-flex align-items-center">
-                  <!-- <img src="<%# item.imageUrl %>" alt="product image" class="order-img me-2"> -->
                   <div>
                     <div><%= item.name %></div>
                     <small class="text-muted">數量: <%= item.quantity %></small>
@@ -84,35 +91,55 @@
     </form>
   </div>
 
+  <!-- ✨ 修改點：優化後的 JS -->
   <script>
-    const radios = document.querySelectorAll('input[name="paymentMethod"]');
-    const infoDiv = document.getElementById('paymentInfo');
+    document.addEventListener('DOMContentLoaded', function() {
+      const radios = document.querySelectorAll('input[name="paymentMethod"]');
+      const infoDiv = document.getElementById('paymentInfo');
 
-    radios.forEach(radio => {
-      radio.addEventListener('change', () => {
+      // 根據傳入的值，顯示對應的說明
+      function displayPaymentInfo(selectedValue) {
         let html = '';
-        switch (radio.value) {
+        if (!selectedValue) {
+          infoDiv.style.display = 'none';
+          return;
+        }
+
+        switch (selectedValue) {
           case 'bank_transfer':
             html = `
               <p class="text-danger fw-bold">請先完成轉帳後，我們才會安排出貨。</p>
-              <p>銀行名稱：台北富邦商業銀行<br>分行：中壢分行<br>帳號：12345678901234<br>戶名：駿英水果</p>
+              <p class="mb-0">銀行名稱：台北富邦商業銀行<br>分行：中壢分行<br>帳號：12345678901234<br>戶名：駿英企業社</p>
             `;
             break;
           case 'remittance':
             html = `
               <p class="text-danger fw-bold">請先完成匯款後，我們才會安排出貨。</p>
-              <p>郵局代碼：700<br>帳號：00412345678901<br>戶名：駿英水果有限公司</p>
+              <p class="mb-0">郵局代碼：700<br>帳號：00412345678901<br>戶名：駿英企業社</p>
             `;
             break;
           case 'cod':
             html = `
-              <p class="text-success">商品將於出貨後 2–3 個工作天送達指定地址。</p>
+              <p class="text-success mb-0">商品將於出貨後 2–3 個工作天送達指定地址。</p>
             `;
             break;
         }
         infoDiv.innerHTML = html;
         infoDiv.style.display = 'block';
+      }
+
+      // 為每個選項加上 'change' 事件監聽
+      radios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          displayPaymentInfo(radio.value);
+        });
       });
+
+      // 頁面載入時，檢查是否有已選中的項目，並立即顯示其說明
+      const initiallyChecked = document.querySelector('input[name="paymentMethod"]:checked');
+      if (initiallyChecked) {
+        displayPaymentInfo(initiallyChecked.value);
+      }
     });
   </script>
 </body>
