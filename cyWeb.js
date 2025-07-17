@@ -15,6 +15,8 @@ const morgan = require('morgan');
 if(process.env.NODE_ENV === 'development') {
   const swaggerUi = require('swagger-ui-express');
   const swaggerSpec = require('./swagger.js');
+  // swagger
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
 
 
@@ -55,8 +57,7 @@ app.set('layout','layouts/main');
 // 設置靜態檔案目錄
 app.use(express.static('public'));
 
-// swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 // router path
 app.get('/', (req, res) => {
