@@ -29,7 +29,7 @@ const sendVerificationEmail = async (to,verification_token) => {
         await sendgrid.send({
             to,
             from:{
-                email:process.env.NO_REPLAY_EMAIL,
+                email:process.env.NO_REPLY_EMAIL,
                 name:'駿英企業社'
             },
             templateId:process.env.VERIFICATION_TEMPLATE_ID,
@@ -39,7 +39,7 @@ const sendVerificationEmail = async (to,verification_token) => {
             }
         });
     } catch (error) {
-        console.error('Failed to send verification mail:', error.response);
+        console.error('Failed to send verification mail:', error.response.body.errors);
         throw error;
     }
 }
@@ -51,7 +51,7 @@ const sendResetPasswordEmail = async (to, resetPasswordToken) => {
         await sendgrid.send({
             to,
             from:{
-                email:process.env.NO_REPLAY_EMAIL,
+                email:process.env.NO_REPLY_EMAIL,
                 name:'駿英企業社'
             },
             templateId:process.env.RESET_PASSWORD_TEMPLATE_ID,
