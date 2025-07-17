@@ -8,17 +8,17 @@ const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 
-// GET: checkout-step1 page
-router.get('/step1', orderController.getCheckoutPage);
-// POST: checkout-step2 page
-router.post('/step2', orderController.getCheckoutStep2);
-// POST: checkout-step3 page
-router.post('/step3',orderController.getCheckoutStep3);
-// POST: checkout-success page
-router.post('/submit', orderController.getCheckoutSuccess);
-// GET: get order history
+router.get('/personal-info', orderController.getCheckoutPage);
+router.post('/personal-info', orderController.postPersonalInfo);
+router.get('/address', orderController.getCheckoutStep2);
+router.post('/address', orderController.postCheckoutStep2);
+router.get('/address', orderController.getCheckoutStep2);
+router.post('/address', orderController.postCheckoutStep2);
+router.get('/payment', orderController.getCheckoutStep3);
+router.post('/payment',orderController.postCheckoutStep3);
+router.get('/confirmation', orderController.postCheckoutConfirmation);
+router.post('/place-order', orderController.getCheckoutSuccess);
 router.get('/history', orderController.getOrderhistory);
-// GET: get order-detail for user
 router.get('/:orderNumber', orderController.getOrderDetail);
 
 module.exports = router;

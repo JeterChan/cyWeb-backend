@@ -9,17 +9,6 @@ const flash = require('connect-flash');
 const session = require('./middleware/session');
 const morgan = require('morgan');
 
-
-// swagger
-// development only
-if(process.env.NODE_ENV === 'development') {
-  const swaggerUi = require('swagger-ui-express');
-  const swaggerSpec = require('./swagger.js');
-  // swagger
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-}
-
-
 // router
 const productRouter = require('./routes/productRouter.js');
 const adminRouter = require('./routes/adminRouter.js');
@@ -57,7 +46,14 @@ app.set('layout','layouts/main');
 // 設置靜態檔案目錄
 app.use(express.static('public'));
 
-
+// swagger
+// development only
+if(process.env.NODE_ENV === 'development') {
+  const swaggerUi = require('swagger-ui-express');
+  const swaggerSpec = require('./swagger.js');
+  // swagger
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
 
 // router path
 app.get('/', (req, res) => {
