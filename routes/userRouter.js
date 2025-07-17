@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { registerValidation,ensureAuthenticated,ensureGuest } = require('../middleware/authValidation');
 const userController = require('../controllers/userController');
+const passport = require('../config/passport');
 
 // 顯示登入頁面
 router.get('/login', ensureGuest, userController.getLoginPage)
@@ -27,5 +28,12 @@ router.post('/forgot-password', ensureGuest, userController.forgotPassword);
 router.get('/reset-password/:token', ensureGuest, userController.getResetPasswordPage);
 // 處理重設密碼請求
 router.post('/reset-password/:token', ensureGuest, userController.resetPassword);
+// google 登入
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile','email'] }));
+router.get('/auth/google/callback', passport.authenticate('google', { successRedirect:'/',failureRedirect: '/login'}),
+ function(req, res) {
+    res.redirect('/');
+  }
+);
 
 module.exports = router;

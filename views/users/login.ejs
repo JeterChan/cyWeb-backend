@@ -14,14 +14,21 @@
                             <label for="password" class="form-label">密碼</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember">
-                            <label class="form-check-label" for="remember">記住我</label>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check mb-0">
+                                <input type="checkbox" class="form-check-input" id="remember">
+                                <label class="form-check-label" for="remember">記住我</label>
+                            </div>
+                            <a href="/users/forgot-password" class="text-decoration-none">忘記密碼？</a>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">登入</button>
                     </form>
-                    <div class="text-center mt-3">
-                        <a href="/users/forgot-password" class="text-decoration-none">忘記密碼？</a>
+
+                    <div class="d-flex justify-content-center">
+                        <a href="/users/auth/google" class="btn btn-google mt-3">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" style="margin-bottom:3px;">
+                            以 Google 帳號登入
+                        </a>
                     </div>
                     <hr>
                     <div class="text-center">

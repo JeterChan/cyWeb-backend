@@ -1,150 +1,57 @@
-const { Product, Subcategory, Category, Cart} = require('../db/models')
+const { Product, Subcategory, Category} = require('../db/models')
 const { Op } = require("sequelize");
+
+const productService = require('../services/productService');
 
 // get all products
 // 顯示商品列表
 const getProducts = async(req, res) => {
     try {
-        
-        // 從查詢參數取得類別的slug
         const categorySlug = req.query.category;
         const subcategorySlug = req.query.subcategory;
+        const page = req.query.page || 1;
 
-        // 從查詢參數獲取當前頁碼, 若無則為1
-        const currentPage = parseInt(req.query.page) || 1;
-        const perPage = 12;
+        const data = await productService.getProductsData(categorySlug, subcategorySlug, page);
 
-        let products = [];
-        let totalCount = 0;
-        let subcategories = [];
-
-        // 先判斷 subcategory 有無存在
-        // subcategorySlug 存在, 代表 category 必存在
-        // 若選擇某類別的子類別, 左側的篩選器不需要變動, 維持原狀, 因此需要回傳該類別的所有子類別
-        if(subcategorySlug) {
-            // 回傳的 products 是該 subcategory 的所有商品
-            const subcategory = await Subcategory.findOne({
-                where:{slug:subcategorySlug},
+        // 處理 Service 層回傳的 null (表示找不到類別)
+        if (data === null) {
+            return res.status(404).json({
+                status: 'error',
+                message: '找不到指定的類別'
             });
-
-            // 找該 subcategory 的所有商品
-            const {count, rows} = await Product.findAndCountAll({
-                where:{subcategoryId:subcategory.id},
-                limit: perPage,
-                offset: (currentPage - 1) * perPage,
-            })
-
-            products = rows;
-            totalCount = count;
-
-            // 回傳category 的所有子類別
-            categoryWithSub = await Category.findOne({
-                where:{ slug: categorySlug },
-                include:[{
-                    model:Subcategory,
-                    as:'subcategories',
-                    attributes:['id','name','slug']
-                }]
-            });
-
-            subcategories = categoryWithSub.subcategories;
         }
 
-        // 若有指定的 category
-        if(categorySlug && !subcategorySlug) {
-            const categoryWithSub = await Category.findOne({
-                where:{slug:categorySlug},
-                include:[{
-                    model:Subcategory,
-                    as:'subcategories',
-                    attributes:['id','name','slug'],
-                }]
-            });
-
-            if(!categoryWithSub) {
-                return res.status(404).json({
-                    status:'error',
-                    message:'找不到指定的類別'
-                })
-            }
-            
-            // 使用 map 陣列方法提取所有的屬於該 category 的 subcategory id
-            const subcategoryIds = categoryWithSub.subcategories.map(sub => sub.id);
-            subcategories = categoryWithSub.subcategories;
-
-            // 一次查詢完所有子類別的商品
-            // 避免 N+1 問題，多查詢一次，可能會消耗很多時間
-            const result = await Product.findAndCountAll({
-                where:{
-                    subcategoryId:{
-                        [Op.in]:subcategoryIds // 使用 Op.in 一次查詢完畢
-                    }
-                },
-                limit:perPage,
-                offset:(currentPage - 1) * perPage,
-                include:[
-                    {
-                        model:Subcategory,
-                        as:'subcategory',
-                        attributes:['id','name'],
-                        include:[{
-                            model:Category,
-                            as:'category',
-                            attributes:['id','name']
-                        }]
-                    }
-                ]
-            });
-
-            products = result.rows;
-            totalCount = result.count;
-        } 
-        if(!categorySlug && !subcategorySlug) {
-             // 查詢所有商品
-            const { count, rows } = await Product.findAndCountAll({
-                limit: perPage,
-                offset: (currentPage - 1) * perPage
-            });
-
-            products = rows;
-            totalCount = count;
-        }
-
-        // 回傳所有類別, 用於 Navbar
-        // 前後端分離應該會有不同寫法，現在這個 route 負責渲染 product list, 若為前後端分離，會專門寫一支api回傳所有類別給navbar component用
-        const categories = await Category.findAll();
-        const totalPages = Math.ceil(totalCount / perPage);
-        
-        // 當沒有找到任何的商品或沒有任何類別的時候代表整個網站都沒東西
-        if(products.length === 0) {
+        // 如果沒有找到任何商品，重定向並顯示警告
+        if (data.products.length === 0) {
             req.flash('warning_msg', '沒有找到任何商品，請嘗試其他搜尋條件');
-            return res.redirect('back'); // 或重定向到適當的頁面
+            return res.redirect('back');
         }
 
-        // 渲染購物車內容
+        // 渲染購物車內容 (這是 Express 應用的常見模式)
         const cart = req.session.cart || [];
 
         res.render('products/productList', {
-            products:products,
-            categories:categories, // 用於 _header.ejs 的類別選單
-            currentCategory:categorySlug || '',
-            currentSubcategory:subcategorySlug || '',
-            subcategories: subcategories, // 回傳該 category 的所有子類別
-            currentPage,
-            totalPages,
-            selectedCategory: categorySlug, // 點選分頁的時候可以帶著該分類的slug
+            products: data.products,
+            categories: data.categories,
+            currentCategory: categorySlug || '',
+            currentSubcategory: subcategorySlug || '',
+            subcategories: data.subcategories,
+            currentPage: data.currentPage,
+            totalPages: data.totalPages,
+            selectedCategory: categorySlug,
             isAuthenticated: req.isAuthenticated(),
-            cart:cart,
+            cart: cart,
             cartItemCount: cart.length
-        })
+        });
 
-    } catch(error){
+    } catch(error) {
+        console.error(error); // 記錄錯誤
         res.status(500).json({
-            status:'error',
-            message:error.message
-        })
+            status: 'error',
+            message: error.message
+        });
     }
-}
+};
 
 // get one product
 const getOneProduct = async(req,res) => {
@@ -179,47 +86,6 @@ const getOneProduct = async(req,res) => {
     }
 }
 
-// get category products
-const getCategoryProducts = async (req, res) => {
-    try {
-        const { category } = req.params;
-
-        if(!category) {
-            return res.status(404).render('404');
-        };
-        // 回傳該 category 的 subcategory
-        const categoryWithSub = await Category.findOne({
-            where:{ slug:category },
-            include:[{
-                model:Subcategory,
-                as:'subcategories'
-            }]
-        });
-
-        // 一次查詢, 避免N+1問題
-        // 回傳該類別的所有商品
-        const products = await Product.findAll({
-            where:{
-                subcategoryId:{
-                    [Op.in]:categoryWithSub.subcategories.map(sub => sub.id)
-                }
-            }
-        })
-        
-        
-    } catch (error) {
-        
-    }
-}
-
-// get subcategory products
-const getSubcategoryProducts = async (req, res) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
 // create new product
 const createNewProduct = async (req, res) => {
     try {
@@ -363,48 +229,6 @@ const deleteProduct = async (req, res) => {
     }
 }
 
-// get product EDM
-const getProductsEDM = async (req, res) => {
-    const { page } = req.params; // A, B, C ...
-    // 渲染購物車內容
-    const cart = req.session.cart || [];
-    const cartItemCount = cart.length;
-    const totalItemCount = cart.reduce((total, item) => total + item.quantity, 0);
-    
-    if(!page) {
-        return res.redirect('/products/A');
-    }
-    // 驗證 page 參數
-    if (!/^[A-P]$/.test(page)) {
-        return res.status(404).render('404'); // 或重導至首頁
-    }
-    
-    try {
-        // 去 db 撈 productNumber 為 ${page} 開頭的商品
-        const products = await Product.findAll({
-            where:{
-                productNumber: {
-                    [Op.like]:`${page}%`
-                }
-            }
-        })
-
-        const imagePath = `EDM-2025-03-${page}.jpg`;
-        res.render('products/product',{
-            productImage: imagePath,
-            products: products,
-            currentPage: page,  // 新增這個參數
-            cart: cart,
-            cartItemCount: cartItemCount,
-            totalItemCount: totalItemCount,
-        });
-    } catch (error) {
-        console.error('載入產品目錄時發生錯誤:', error);
-        res.status(500).render('error', { message: '載入失敗' });
-    }
-
-}
-
 // post: upload images
 const uploadImage = async (req, res) => {
     // 將 image 儲存在 CDN
@@ -437,8 +261,5 @@ module.exports = {
     createNewProduct,
     updateProduct,
     deleteProduct,
-    getProductsEDM,
     uploadImage,
-    getCategoryProducts,
-    getSubcategoryProducts
 }

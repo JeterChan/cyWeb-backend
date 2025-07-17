@@ -27,13 +27,18 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.STRING,
       allowNull:true
     },
+    googleId:{
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true
+    },
     email: { 
       type:DataTypes.STRING,
       allowNull:false
     },
     password: {
       type:DataTypes.STRING,
-      allowNull:false
+      allowNull:true
     },
     role: { 
       type:DataTypes.ENUM('user','admin'),

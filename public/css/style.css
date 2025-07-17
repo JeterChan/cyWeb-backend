@@ -49,6 +49,24 @@ footer a:hover {
   border-color: #80bdff;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
+.btn-google {
+  background: white;
+  border: 1px solid #dadada;
+  color: #555;
+  padding: 8px 20px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 1rem;
+  transition: box-shadow .2s;
+}
+.btn-google:hover {
+  box-shadow: 0 1px 6px rgba(60,64,67,.15);
+}
+.btn-google img {
+  margin-right: 8px;
+}
+
 
 @media (max-width: 991.98px) {
   .navbar-nav {

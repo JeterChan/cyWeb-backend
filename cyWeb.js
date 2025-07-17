@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const expressLayouts = require('express-ejs-layouts');
+const passport = require('passport');
 const passportConfig = require('./config/passport');
 const flash = require('connect-flash');
 const session = require('./middleware/session');
@@ -34,7 +35,9 @@ if(process.env.NODE_ENV === 'production'){
 // session config
 app.use(session)
 // 初始化並配置 Passport
-passportConfig(app);
+// init passport module
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash())
 app.use(setLocals);
 
