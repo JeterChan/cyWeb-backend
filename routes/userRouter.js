@@ -29,7 +29,7 @@ router.get('/reset-password/:token', ensureGuest, userController.getResetPasswor
 // 處理重設密碼請求
 router.post('/reset-password/:token', ensureGuest, userController.resetPassword);
 // google 登入
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile','email'] }));
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile','email'], prompt: 'select_account' }));
 router.get('/auth/google/callback', passport.authenticate('google', { successRedirect:'/',failureRedirect: '/login'}),
  function(req, res) {
     res.redirect('/');
